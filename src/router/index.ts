@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Main from "@/views/main/index.vue";
 import StakeEnterAmount from "@/views/stake-enter-amount/index.vue";
 import StakeConfirm from "@/views/stake-confirm/index.vue";
+import Portfolio from "@/views/portfolio/index.vue";
 
 const routes = {
   main: {
@@ -29,6 +30,13 @@ const routes = {
         name: "stake-confirm",
       },
     ],
+  },
+  portfolio: {
+    path: "/portfolio",
+    components: {
+      view: Portfolio,
+    },
+    name: "portfolio",
   },
 };
 

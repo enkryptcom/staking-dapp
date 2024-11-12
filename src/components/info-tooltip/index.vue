@@ -1,6 +1,6 @@
 <template>
   <div class="info-tooltip" @mouseenter="onHover" @mouseleave="onHide">
-    <info-icon />
+    <tooltip-info-icon :fill="fill" :opacity="opacity" />
     <div v-show="show" class="info-tooltip__text" :class="classObject()">
       {{ text }}
     </div>
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import InfoIcon from "@/icons/common/info-icon.vue";
+import TooltipInfoIcon from "@/icons/common/tooltip-info-icon.vue";
 import { ref } from "vue";
 
 const show = ref(false);
@@ -19,6 +19,14 @@ defineProps({
   text: {
     type: String,
     default: "",
+  },
+  fill: {
+    type: String,
+    default: "black"
+  },
+  opacity: {
+    type: String,
+    default: "0.32"
   },
 });
 
@@ -57,21 +65,23 @@ const classObject = () => {
 
 <style lang="less">
 @import "@/assets/styles/theme.less";
+
 .info-tooltip {
-  display: inline-block;
+  display: block;
   position: relative;
   font-size: 0;
-  top: 1px;
+  height: 12px;
+  margin-left: 2px;
 
   &__text {
     position: absolute;
-    bottom: 25px;
-    left: 50%;
-    margin-left: -128px;
+    top: 12px;
+    left: 100%;
+    margin-left: 0;
     padding: 8px 12px;
     position: absolute;
-    width: 256px;
-    background: @surfaceTetriary;
+    width: 176px;
+    background: @white;
     border-radius: 8px;
     .sizing();
     .caption__Regular();
@@ -79,6 +89,8 @@ const classObject = () => {
     color: @secondaryLabel;
     .transition(opacity, 300ms);
     opacity: 0;
+    box-shadow: @shadow16;
+    z-index: 101;
 
     &.visible {
       opacity: 1;

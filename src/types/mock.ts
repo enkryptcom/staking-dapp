@@ -4,6 +4,7 @@ import { Token } from "@/types/token";
 import { GasFeeInfo } from "@/types/transaction";
 import { Account } from "@/types/account";
 import { Validator } from "@/types/staking";
+import { PortfolioItemStatus, PortfolioItem } from "@/types/portfolio";
 
 export const selectNetwork: Network = {
   id: 1,
@@ -63,6 +64,14 @@ export const solana: Token = {
   image: require("@/assets/pic/solana.token.svg"),
   symbol: "sol",
   price: 10.2,
+};
+
+export const ethereum: Token = {
+  id: 1,
+  name: "Ethereum",
+  image: require("@/assets/pic/ethereum.network.png"),
+  symbol: "eth",
+  price: 2460.2,
 };
 
 export const fee: GasFeeInfo = {
@@ -160,3 +169,109 @@ export const p2p: Validator = {
   isHighRisk: false,
   isOversubscribed: true,
 };
+
+export const stakefish: Validator = {
+  id: 1,
+  name: "P2P.org",
+  image: require("@/assets/pic/stakefish.validator.png"),
+  address: "15pSLMoW287q4jYKBRsKr6bydqwR8xrZpAmxGFyUZBB4m73P",
+  nominators: 0.0406,
+  commission: 0.08,
+  total: 40,
+  bonded: 20,
+  returns: 10,
+  token: solana,
+  isActive: true,
+  isBlocking: true,
+  isElected: true,
+  isNominating: true,
+  isHighRisk: false,
+  isOversubscribed: true,
+};
+
+export const myPortfolio: PortfolioItem[] = [
+  {
+    id: 1,
+    items: [
+      {
+        id: 1,
+        validator: p2p,
+        balance: 40,
+        reward: 0,
+        status: PortfolioItemStatus.activating,
+        isStake: false,
+        isUnStake: true,
+        isClose: false,
+        isWithdraw: false
+      },
+      {
+        id: 2,
+        validator: stakefish,
+        balance: 24,
+        reward: 0.124,
+        status: PortfolioItemStatus.active,
+        isStake: false,
+        isUnStake: true,
+        isClose: false,
+        isWithdraw: false
+      },
+      {
+        id: 3,
+        validator: stakefish,
+        balance: 40,
+        reward: 0.23,
+        status: PortfolioItemStatus.deactivating,
+        isStake: false,
+        isUnStake: false,
+        isClose: false,
+        isWithdraw: false
+      },
+      {
+        id: 4,
+        validator: p2p,
+        balance: 40,
+        reward: 0.23,
+        status: PortfolioItemStatus.unstaked,
+        isStake: true,
+        isUnStake: false,
+        isClose: false,
+        isWithdraw: true
+      },
+      {
+        id: 5,
+        validator: stakefish,
+        balance: 0,
+        reward: 0,
+        status: PortfolioItemStatus.empty,
+        isStake: false,
+        isUnStake: false,
+        isClose: true,
+        isWithdraw: false
+      }
+    ],
+    totalStaked: 40,
+    totalRewards: 0,
+    avgRewards: 0.0646,
+    token: solana,
+  },
+  {
+    id: 2,
+    items: [
+      {
+        id: 1,
+        validator: p2p,
+        balance: 40,
+        reward: 0,
+        status: PortfolioItemStatus.active,
+        isStake: false,
+        isUnStake: true,
+        isClose: false,
+        isWithdraw: false
+      }
+    ],
+    totalStaked: 0.345,
+    totalRewards: 0.023,
+    avgRewards: 0.0446,
+    token: ethereum,
+  },
+];
