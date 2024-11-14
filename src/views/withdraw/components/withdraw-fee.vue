@@ -1,10 +1,10 @@
 <template>
-  <div class="stake-confirm-fee">
-    <p class="stake-confirm-fee__title">Network fee:</p>
-    <p class="stake-confirm-fee__fiat">
+  <div class="withdraw-fee">
+    <p class="withdraw-fee__title">Network fee:</p>
+    <p class="withdraw-fee__fiat">
       {{ $filters.currencyFormat(fee.fiatValue, fee.fiatSymbol) }}
     </p>
-    <p class="stake-confirm-fee__amount">
+    <p class="withdraw-fee__amount">
       {{ $filters.cryptoCurrencyFormat(fee.nativeValue) }} <span>{{ fee.nativeSymbol }}</span>
     </p>
   </div>
@@ -30,7 +30,7 @@ defineProps({
 <style lang="less" scoped>
 @import "@/assets/styles/theme.less";
 
-.stake-confirm-fee {
+.withdraw-fee {
   padding: 12px 12px 12px 60px !important;
   display: flex;
   justify-content: flex-start;

@@ -33,9 +33,9 @@
         </div>
       </div>
       <div class="col-3 portfolio-item-validator__buttons">
-        <base-button v-if="item.isUnStake" title="Unstake" :stroke="true" :small="true" />
+        <base-button v-if="item.isUnStake" title="Unstake" :stroke="true" :small="true" @click="unstakeAction" />
         <base-button v-if="item.isClose" title="Close" :stroke="true" :small="true" />
-        <base-button v-if="item.isWithdraw" title="Withdraw" :stroke="true" :small="true" />
+        <base-button v-if="item.isWithdraw" title="Withdraw" :stroke="true" :small="true" @click="withdrawAction" />
         <base-button v-if="item.isStake" title="Stake" :small="true" />
 
         <a @click="moreAction" class="portfolio-item-validator__buttons-more">
@@ -56,7 +56,9 @@ import { PortfolioValidatorItem, PortfolioItemStatus } from "@/types/portfolio";
 import MoreIcon from "@/icons/common/more-icon.vue";
 import InfoTooltip from "@/components/info-tooltip/index.vue";
 import { onClickOutside } from "@vueuse/core";
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const isShowsMenu = ref(false);
 const menu = ref(null);
 
@@ -113,6 +115,14 @@ const moreAction = () => {
 onClickOutside(menu, () => {
   if (isShowsMenu.value) isShowsMenu.value = false;
 });
+
+const unstakeAction = () => {
+  router.push({ name: 'unstake' });
+};
+
+const withdrawAction = () => {
+  router.push({ name: 'withdraw' });
+};
 </script>
 
 <style lang="less" scoped>

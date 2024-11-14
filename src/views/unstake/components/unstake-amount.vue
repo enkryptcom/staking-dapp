@@ -1,9 +1,9 @@
 <template>
-  <div class="stake-confirm-amount">
-    <img class="stake-confirm-amount__icon" :src="token.image" />
-    <div class="stake-confirm-amount__info">
-      <div class="stake-confirm-amount__info-title">Staking amount</div>
-      <h2 class="stake-confirm-amount__info-amount">
+  <div class="unstake-amount">
+    <img class="unstake-amount__icon" :src="token.image" />
+    <div class="unstake-amount__info">
+      <div class="unstake-amount__info-title">Unstaking amount</div>
+      <h2 class="unstake-amount__info-amount">
         {{ $filters.cryptoCurrencyFormat(amount) }}
         <span>{{ token.symbol }}</span>
       </h2>
@@ -31,9 +31,9 @@ defineProps({
 <style lang="less" scoped>
 @import "@/assets/styles/theme.less";
 
-.stake-confirm-amount {
+.unstake-amount {
   width: 100%;
-  height: 64px;
+  height: 64%;
   text-decoration: none;
   position: relative;
   box-sizing: border-box;

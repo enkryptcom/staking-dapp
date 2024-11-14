@@ -1,9 +1,9 @@
 <template>
-  <div class="stake-confirm-amount">
-    <img class="stake-confirm-amount__icon" :src="token.image" />
-    <div class="stake-confirm-amount__info">
-      <div class="stake-confirm-amount__info-title">Staking amount</div>
-      <h2 class="stake-confirm-amount__info-amount">
+  <div class="withdraw-amount">
+    <img class="withdraw-amount__icon" :src="token.image" />
+    <div class="withdraw-amount__info">
+      <div class="withdraw-amount__info-title">Withdrawal amount</div>
+      <h2 class="withdraw-amount__info-amount">
         {{ $filters.cryptoCurrencyFormat(amount) }}
         <span>{{ token.symbol }}</span>
       </h2>
@@ -31,7 +31,7 @@ defineProps({
 <style lang="less" scoped>
 @import "@/assets/styles/theme.less";
 
-.stake-confirm-amount {
+.withdraw-amount {
   width: 100%;
   height: 64px;
   text-decoration: none;

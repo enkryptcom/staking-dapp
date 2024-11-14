@@ -1,6 +1,7 @@
 <template>
-  <div class="info-tooltip" @mouseenter="onHover" @mouseleave="onHide">
-    <tooltip-info-icon :fill="fill" :opacity="opacity" />
+  <div class="info-tooltip" :class="{ big: isBigIcon }" @mouseenter="onHover" @mouseleave="onHide">
+    <info-icon v-if="isBigIcon" />
+    <tooltip-info-icon v-else :fill="fill" :opacity="opacity" />
     <div v-show="show" class="info-tooltip__text" :class="classObject()">
       {{ text }}
     </div>
@@ -9,6 +10,8 @@
 
 <script setup lang="ts">
 import TooltipInfoIcon from "@/icons/common/tooltip-info-icon.vue";
+import InfoIcon from "@/icons/common/info-icon.vue";
+
 import { ref } from "vue";
 
 const show = ref(false);
@@ -19,6 +22,10 @@ defineProps({
   text: {
     type: String,
     default: "",
+  },
+  isBigIcon: {
+    type: Boolean,
+    default: false,
   },
   fill: {
     type: String,
@@ -72,6 +79,11 @@ const classObject = () => {
   font-size: 0;
   height: 12px;
   margin-left: 2px;
+
+  &.big {
+    height: 16px;
+    margin-left: 0;
+  }
 
   &__text {
     position: absolute;

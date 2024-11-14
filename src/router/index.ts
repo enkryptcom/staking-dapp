@@ -3,6 +3,8 @@ import Main from "@/views/main/index.vue";
 import StakeEnterAmount from "@/views/stake-enter-amount/index.vue";
 import StakeConfirm from "@/views/stake-confirm/index.vue";
 import Portfolio from "@/views/portfolio/index.vue";
+import Unstake from "@/views/unstake/index.vue";
+import Withdraw from "@/views/withdraw/index.vue";
 
 const routes = {
   main: {
@@ -37,6 +39,20 @@ const routes = {
       view: Portfolio,
     },
     name: "portfolio",
+  },
+  unstake: {
+    path: "/unstake",
+    components: {
+      view: Unstake,
+    },
+    name: "unstake",
+  },
+  withdraw: {
+    path: "/withdraw",
+    components: {
+      view: Withdraw,
+    },
+    name: "withdraw",
   },
 };
 

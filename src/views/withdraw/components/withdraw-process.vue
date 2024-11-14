@@ -1,29 +1,29 @@
 <template>
-  <div v-if="isDone" class="stake-confirm-process">
-    <div class="stake-confirm-process__stack">
+  <div v-if="isDone" class="withdraw-process">
+    <div class="withdraw-process__stack">
       <done-animation />
-      <h3>SOL staked!</h3>
-      <p>Your SOL will begin earning rewards in the next couple days once the stake account is activated.</p>
+      <h3>Withdrawing SOL</h3>
+      <p>We are withdrawing your SOL from this stake account.</p>
       <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
     </div>
-    <div class="stake-confirm-process__button">
+    <div class="withdraw-process__button">
       <base-button title="Done" :action="doneAction" :send="true" />
     </div>
   </div>
-  <div v-else-if="isError" class="stake-confirm-process">
-    <div class="stake-confirm-process__stack">
+  <div v-else-if="isError" class="withdraw-process">
+    <div class="withdraw-process__stack">
       <error-animation />
       <h3>Something went wrong...</h3>
       <p>We’re sorry, but it looks like there’s been an error. Please refresh the page or try again later.</p>
     </div>
-    <div class="stake-confirm-process__button">
+    <div class="withdraw-process__button">
       <base-button title="Go Back" :action="backAction" :send="true" />
     </div>
   </div>
-  <div v-else class="stake-confirm-process stake-confirm-process--center">
+  <div v-else class="withdraw-process withdraw-process--center">
     <spinner-animation />
-    <h3>Staking SOL</h3>
-    <p>Creating your staking account and delegating your SOL to P2P.org validator.</p>
+    <h3>SOL Withdrawn</h3>
+    <p>Your SOL has been withdrawn.</p>
     <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
   </div>
 </template>
@@ -64,7 +64,7 @@ const doneAction = () => {
 <style lang="less" scoped>
 @import "@/assets/styles/theme.less";
 
-.stake-confirm-process {
+.withdraw-process {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -94,10 +94,6 @@ const doneAction = () => {
     margin: 0;
     text-align: center;
     padding: 0 20%;
-
-    .screen-xs({
-      padding: 0 16px;
-    });
   }
 
   .base-button {
