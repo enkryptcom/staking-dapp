@@ -35,24 +35,29 @@ const routes = {
   },
   portfolio: {
     path: "/portfolio",
-    components: {
-      view: Portfolio,
-    },
-    name: "portfolio",
-  },
-  unstake: {
-    path: "/unstake",
-    components: {
-      view: Unstake,
-    },
-    name: "unstake",
-  },
-  withdraw: {
-    path: "/withdraw",
-    components: {
-      view: Withdraw,
-    },
-    name: "withdraw",
+    children: [
+      {
+        path: "",
+        components: {
+          view: Portfolio,
+        },
+        name: "portfolio",
+      },
+      {
+        path: "unstake",
+        components: {
+          view: Unstake,
+        },
+        name: "unstake",
+      },
+      {
+        path: "withdraw",
+        components: {
+          view: Withdraw,
+        },
+        name: "withdraw",
+      },
+    ],
   },
 };
 

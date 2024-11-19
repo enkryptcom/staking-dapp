@@ -12,7 +12,7 @@
           <a href="#">Aptos staking</a>
           <span>+36 other chains</span>
         </div>
-        <router-link :to="{ path: 'portfolio' }" class="portfolio">
+        <router-link :to="{ name: 'portfolio' }" class="portfolio">
           <portfolio-icon />
           <span>My staking portfolio</span>
         </router-link>

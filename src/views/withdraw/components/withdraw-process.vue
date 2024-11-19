@@ -2,8 +2,8 @@
   <div v-if="isDone" class="withdraw-process">
     <div class="withdraw-process__stack">
       <done-animation />
-      <h3>Withdrawing SOL</h3>
-      <p>We are withdrawing your SOL from this stake account.</p>
+      <h3>SOL Withdrawn</h3>
+      <p>Your SOL has been withdrawn.</p>
       <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
     </div>
     <div class="withdraw-process__button">
@@ -22,8 +22,8 @@
   </div>
   <div v-else class="withdraw-process withdraw-process--center">
     <spinner-animation />
-    <h3>SOL Withdrawn</h3>
-    <p>Your SOL has been withdrawn.</p>
+    <h3>Withdrawing SOL</h3>
+    <p>We are withdrawing your SOL from this stake account.</p>
     <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
   </div>
 </template>
@@ -53,11 +53,11 @@ const backAction = () => {
 };
 
 const detailsAction = () => {
-  router.push({ name: "stake" });
+  
 };
 
 const doneAction = () => {
-  router.push({ name: "main" });
+  router.push({ name: "portfolio" });
 };
 </script>
 

@@ -83,7 +83,7 @@ export const fee: GasFeeInfo = {
 
 export const fromAccount: Account = {
   id: 1,
-  name: "My account nickname",
+  name: "My main account",
   image: require("@/assets/pic/account1.png"),
   address: "15pSLMoW287q4jYKBRsKr6bydqwR8xrZpAmxGFyUZBB4m73P",
   isLedger: false,

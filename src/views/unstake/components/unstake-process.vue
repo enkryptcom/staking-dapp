@@ -53,11 +53,11 @@ const backAction = () => {
 };
 
 const detailsAction = () => {
-  router.push({ name: "portfolio" });
+  
 };
 
 const doneAction = () => {
-  router.push({ name: "main" });
+  router.push({ name: "portfolio" });
 };
 </script>
 
