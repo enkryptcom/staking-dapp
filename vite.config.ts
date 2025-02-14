@@ -5,9 +5,6 @@ import requireTransform from "vite-plugin-require-transform";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue(), requireTransform({})],
-  resolve: {
-    alias: {
-      "@/": new URL("./src/", import.meta.url).pathname,
-    },
-  },
+  resolve: { alias: { "@/": new URL("./src/", import.meta.url).pathname } },
+  css: { preprocessorOptions: { less: { javascriptEnabled: true } } },
 });
