@@ -11,13 +11,13 @@ export interface SharedState {
   network: string;
   price: Price;
   priceStats: {
-    priceChangePercentage: number,
-    priceChange: number,
-    priceSparkline: number[],
-    marketCap: number,
-  },
-  isConnectModalVisible: boolean,
-};
+    priceChangePercentage: number;
+    priceChange: number;
+    priceSparkline: number[];
+    marketCap: number;
+  };
+  isConnectModalVisible: boolean;
+}
 
 export const initialState: SharedState = {
   account: null,
@@ -26,7 +26,7 @@ export const initialState: SharedState = {
   error: null,
   balance: 0,
   chain: Chains.SOLANA,
-  network: import.meta.env.VITE_ENV,
+  network: import.meta.env.VITE_SOLANA_NETWORK,
   price: {},
   priceStats: {
     priceChangePercentage: 0,
@@ -53,14 +53,21 @@ export const mutations = {
   setPrice(state: SharedState, [currencyId, value]: [string, number]) {
     state.price[currencyId] = value;
   },
-  setPriceStats(state: SharedState,
-    [priceChange, priceChangePercentage, priceSparkline, marketCap]: [number, number, number[], number]) {
+  setPriceStats(
+    state: SharedState,
+    [priceChange, priceChangePercentage, priceSparkline, marketCap]: [
+      number,
+      number,
+      number[],
+      number,
+    ]
+  ) {
     state.priceStats = {
       priceChangePercentage,
       priceChange,
       priceSparkline,
       marketCap,
-    }
+    };
   },
   setError(state: SharedState, error: string) {
     state.error = error;
