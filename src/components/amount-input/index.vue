@@ -119,7 +119,6 @@ const amountValue = computed({
   },
 });
 
-
 const prices = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
 const amountUsd = computed(() => {
@@ -129,6 +128,9 @@ const amountUsd = computed(() => {
 });
 
 const size = computed(() => {
+  if(parseFloat(amountValue.value || "0") == 0) {
+    return 15
+  }
   return amountValue.value.length == 0 ? 5 : amountValue.value.length;
 });
 

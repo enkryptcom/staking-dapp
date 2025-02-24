@@ -21,8 +21,8 @@
                             </span>
                             <span>
                               {{priceStats.priceChangePercentage > 0 ? 
-                                `+$${priceStats.priceChangePercentage.toFixed(2)}` : 
-                                `-$${(priceStats.priceChangePercentage * -1).toFixed(2)}`}}
+                                `+${priceStats.priceChangePercentage.toFixed(2)}%` : 
+                                `-${(priceStats.priceChangePercentage * -1).toFixed(2)}%`}}
                             </span>
                         </div>
                         <p>MCAP ${{ formatValue(priceStats.marketCap) }}</p>
@@ -78,7 +78,7 @@ use([SVGRenderer, LineChart, TooltipComponent, GridComponent]);
 const option = computed(() => {
   return {
     width: 128,
-    height: 56,
+    height: 384,
     color: [priceStats.value.priceChangePercentage >= 0 ? '#15fb3b' : '#e01f43'],
     grid: { show: false, left: 0, top: 0 },
     xAxis: [
@@ -227,6 +227,10 @@ const swapAction = () => {
                         color: @white;
                         margin-right: 4px;
                         display: inline-block;
+                        
+                        .screen-m({
+                          line-height: 11px;
+                        });
 
                         &:last-child {
                             margin-right: 0;
