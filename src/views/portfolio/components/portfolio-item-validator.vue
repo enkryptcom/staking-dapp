@@ -12,7 +12,7 @@
                   <span>{{ item.status }}</span>
                   <info-tooltip 
                     v-if="isShowTooltip"
-                    text="Your SOL is currently staked with a validator. You'll need to unstake to access these funds"
+                    :text="infoTooltipText"
                     :fill="tooltipColor"
                     :opacity="tooltipOpacity"
                   />
@@ -125,6 +125,16 @@ const statusClassObject = computed(() => ({
 
 const isShowTooltip = computed(() => {
   return props.item.status == PortfolioItemStatus.activating || props.item.status == PortfolioItemStatus.deactivating || props.item.status == PortfolioItemStatus.empty
+});
+
+const infoTooltipText = computed(() => {
+  if(props.item.status == PortfolioItemStatus.activating) {
+    return "Your SOL is currently staked with a validator. You'll need to unstake to access these funds";
+  } else if(props.item.status == PortfolioItemStatus.deactivating) {
+    return "You will be able to withdraw your stake in the next couple days once the stake account becomes unstaked.";
+  } 
+
+  return "Your SOL is currently staked with a validator. You'll need to unstake to access these funds"
 });
 
 const validator = computed(() => {

@@ -38,16 +38,23 @@ import CommonModal from "@/components/common-modal/index.vue";
 import BaseButton from "@/components/base-button/index.vue";
 import { ref, watch, computed } from "vue";
 import { useWallet } from "solana-wallets-vue";
+import { Wallet } from "solana-wallets-vue/dist/types/Wallet";
 
 const wallet = useWallet();
 
 const installedWallets = computed(() => {
   const availableWallets = wallet.wallets ?? [];
   return availableWallets.value.filter(
-    (wallet) =>
+    (wallet: Wallet) =>
       wallet.adapter.readyState === 'Installed' ||
       wallet.adapter.readyState === 'Loadable'
-  );
+  ).sort((a: Wallet, b: Wallet) => {
+    if (a.adapter.name == "Enkrypt") {
+      return -1;
+    }
+
+    return 0
+  });
 });
 const props = defineProps({
   isVisible: {
