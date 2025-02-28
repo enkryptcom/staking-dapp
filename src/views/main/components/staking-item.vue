@@ -78,7 +78,7 @@ use([SVGRenderer, LineChart, TooltipComponent, GridComponent]);
 const option = computed(() => {
   return {
     width: 128,
-    height: 384,
+    height: 56,
     color: [priceStats.value.priceChangePercentage >= 0 ? '#15fb3b' : '#e01f43'],
     grid: { show: false, left: 0, top: 0 },
     xAxis: [
@@ -99,6 +99,8 @@ const option = computed(() => {
         splitLine: {
           show: false,
         },
+        min: Math.min.apply(null, priceStats.value.priceSparkline),
+        max: Math.max.apply(null, priceStats.value.priceSparkline),
       },
     ],
     series: [

@@ -69,6 +69,7 @@ const disconnectAction = () => {
 
 const onCopyClicked = () => {
   copyToClipboard(props.account.address);
+  alert("Address has been copied")
 }
 
 const onLinkClicked = () => {
