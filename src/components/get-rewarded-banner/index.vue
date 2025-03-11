@@ -1,7 +1,7 @@
 <template>
   <div class="get-rewarded-banner">
     <h3>Get rewarded by staking your SOL and ETH</h3>
-    <p>Help secure these networks and stake with confidence.<br /><a href="#">Buy tokens</a> or <a href="#">swap assets</a>, and create any staking portfolio you like.</p>
+    <p>Help secure these networks and stake with confidence.<br /><a target="_blank" href="https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt">Buy tokens</a> or swap assets, and create any staking portfolio you like.</p>
     <p>New to staking? Learn <a href="#">what is staking and how to do it</a>?</p>
   </div>
 </template>
