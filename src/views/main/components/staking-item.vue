@@ -125,7 +125,7 @@ const startAction = () => {
 };
 
 const buyAction = () => {
-  window.location.replace("https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt")
+  window.open("https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt", '_blank');
 };
 
 const swapAction = () => {};
