@@ -4,7 +4,7 @@
     <div class="modal-wrapper__content">
       <div class="modal-wrapper__header">
         <h3>{{ title }}</h3>
-        <a class="modal-wrapper__header-close" @click="close"><close-icon /></a>
+        <a class="modal-wrapper__header-close" @click="close" href="javascript:void(0)"><close-icon /></a>
       </div>
       <slot></slot>
     </div>

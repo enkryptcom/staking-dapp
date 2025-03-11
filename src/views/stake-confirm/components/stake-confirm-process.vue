@@ -15,6 +15,7 @@
       <error-animation />
       <h3>Something went wrong...</h3>
       <p>We’re sorry, but it looks like there’s been an error. Please refresh the page or try again later.</p>
+      <p>If the error persists, please <a href="mailto:support@enkrypt.com?subject=Enkrypt Staking Dapp Enquiry">contact support</a></p>
     </div>
     <div class="stake-confirm-process__button">
       <base-button title="Go Back" :action="backAction" :send="true" />

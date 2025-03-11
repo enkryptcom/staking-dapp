@@ -1,5 +1,5 @@
 <template>
-  <a class="back-button" @click="action()">
+  <a class="back-button" @click="action()" href="javascript:void(0)">
     <back-arrow />
   </a>
 </template>

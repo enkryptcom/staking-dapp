@@ -1,6 +1,6 @@
 <template>
   <div class="select-account-input">
-    <a ref="toggle" class="select-account-input__info" @click="toggleAccounts">
+    <a ref="toggle" class="select-account-input__info" @click="toggleAccounts" href="javascript:void(0)">
       <img v-if="account.image" :src="account.image" />
       <div v-else class="select-account-input__info-icon"></div>
       <div class="select-account-input__info-name">

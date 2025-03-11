@@ -36,7 +36,7 @@
         <div class="staking-item__buttons">
             <base-button title="Start staking" :action="startAction" :send="true" />
             <base-button :title="`Buy ${item.chainData.name}`" :action="buyAction" :secondary="true" />
-            <base-button title="Swap" :action="swapAction" :secondary="true" />
+            <!-- <base-button title="Swap" :action="swapAction" :secondary="true" /> -->
         </div>
     </white-wrapper>
 </template>
@@ -125,12 +125,10 @@ const startAction = () => {
 };
 
 const buyAction = () => {
-  
+  window.location.replace("https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt")
 };
 
-const swapAction = () => {
-  
-};
+const swapAction = () => {};
 </script>
   
 <style lang="less" scoped>

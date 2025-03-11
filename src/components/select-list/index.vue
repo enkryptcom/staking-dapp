@@ -1,6 +1,6 @@
 <template>
   <div class="select-list">
-    <a ref="toggle" class="select-list__block" @click="toggleAction">
+    <a ref="toggle" class="select-list__block" @click="toggleAction" href="javascript:void(0)">
       <img :src="select.image" />
       <span v-if="!isMinify">{{ select.name }}</span>
       <arrow-down />

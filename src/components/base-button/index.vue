@@ -8,6 +8,7 @@
       send: send,
       secondary: secondary,
     }"
+    href="javascript:void(0)"
     @click="action()"
   >
     <div v-if="!loading">{{ title }}</div>
