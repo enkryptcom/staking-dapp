@@ -1,6 +1,6 @@
 <template>
   <div class="stake-confirm-account">
-    <img class="stake-confirm-account__icon" :src="account?.image" />
+    <img class="stake-confirm-account__icon" :src="createIcon(account?.address)" />
     <div class="stake-confirm-account__info">
       <h5 class="stake-confirm-account__info-title">{{ title }}</h5>
       <div v-if="!!account?.name" class="stake-confirm-account__info-address">
@@ -20,6 +20,7 @@ import { BASE_TOKENS } from "@/core/constants";
 import { Chains, Token } from "@/core/interfaces";
 import { Account } from "@/types/account";
 import { PropType } from "vue";
+import createIcon from "@/utils/blockies";
 
 defineProps({
   account: {

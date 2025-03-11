@@ -1,7 +1,7 @@
 <template>
   <div class="search-account-input">
     <div class="search-account-input__info">
-      <img v-if="account" :src="account.image" />
+      <img v-if="account" :src="createIcon(account.address)" />
       <div v-else class="search-account-input__info-icon"></div>
       <div class="search-account-input__info-name">
         <h5 class="search-account-input__title">To</h5>
@@ -42,6 +42,7 @@ import AccountSelect from "@/components/account-select/index.vue";
 import { Account } from "@/types/account";
 import { PropType, ref, computed, ComponentPublicInstance } from "vue";
 import { onClickOutside } from "@vueuse/core";
+import createIcon from "@/utils/blockies";
 
 const isOpenDropdown = ref<boolean>(false);
 const isFocus = ref<boolean>(false);

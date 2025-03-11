@@ -1,6 +1,6 @@
 <template>
   <div class="account-select" v-if="account">
-    <a ref="toggle" class="account-select__block" @click="toggleAction">
+    <a ref="toggle" class="account-select__block" @click="toggleAction" href="javascript:void(0)">
       <img :src="wallet.wallet.value?.adapter.icon" />
       <span>{{ $filters.replaceWithEllipsis(account.address, 4, 4) }}</span>
       <arrow-down />
@@ -9,17 +9,17 @@
       <div class="account-select__info">
         <img :src="wallet.wallet.value?.adapter.icon" />
         <span>{{ $filters.replaceWithEllipsis(account.address, 4, 4) }}</span>
-        <div class="account-select__info-action" @click="onCopyClicked">
+        <a class="account-select__info-action" @click="onCopyClicked" href="javascript:void(0)">
           <copy-icon />
-        </div>
-        <div class="account-select__info-action" @click="onLinkClicked">
+        </a>
+        <a class="account-select__info-action" @click="onLinkClicked" href="javascript:void(0)">
           <link-icon />
-        </div>
+        </a>
       </div>
       <div class="account-select__amount">
         {{ $filters.cryptoCurrencyFormat(walletBalance) }} <span>sol</span>
       </div>
-      <a @click="disconnectAction" class="account-select__disconnect">
+      <a @click="disconnectAction" class="account-select__disconnect" href="javascript:void(0)">
         <logout-icon />
         <span>Disconnect</span>
       </a>
@@ -103,6 +103,7 @@ onClickOutside(
     align-items: center;
     cursor: pointer;
     background-color: @accent01;
+    text-decoration: none;
 
     img {
       width: 24px;

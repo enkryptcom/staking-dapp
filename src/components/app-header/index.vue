@@ -5,7 +5,7 @@
         <router-link :to="{ name: 'main' }">
           <logo />
         </router-link>
-        <a @click="toggleMenu" class="header__mobile-menu">
+        <a @click="toggleMenu" class="header__mobile-menu" href="javascript:void(0)">
           <open-menu v-if="!isToggleMenu" />
           <close-menu v-else />
         </a>
@@ -17,6 +17,7 @@
             <span>Get Enkrypt</span>
           </a>
 
+          <!--
           <select-list
             v-if="!isToggleMenu"
             :select="network"
@@ -25,13 +26,14 @@
             :is-list-image="true"
             @update:select="selectNetworkAction"
           />
+          -->
 
           <account-select
             v-if="wallet.connected.value && !isToggleMenu"
             :account="walletAccount"
             @disconnect="disconnectWallet"
           ></account-select>
-          <a v-else-if="!isToggleMenu && !wallet.connected.value" class="header__connect" @click="openWalletModal">
+          <a v-else-if="!isToggleMenu && !wallet.connected.value" class="header__connect" @click="openWalletModal" href="javascript:void(0)">
             Connect
           </a>
         </div>

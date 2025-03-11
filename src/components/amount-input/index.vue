@@ -21,7 +21,7 @@
         class="amount-input__input"
         placeholder="0"
         :class="{ error: isMinValue && props.value != '0' }"
-        :size="size"
+        oninput="this.size = this.value.length"
       />
       <span v-show="props.value != '0'" @click="focus" :class="{ error: isMinValue }">{{ token.symbol }}</span>
     </div>
@@ -125,13 +125,6 @@ const amountUsd = computed(() => {
   const value = parseFloat(amountValue.value || "0");
   const price = prices.value?.[BASE_TOKENS[activeChain.value].symbol] || 0;
   return value * price;
-});
-
-const size = computed(() => {
-  if(parseFloat(amountValue.value || "0") == 0) {
-    return 15
-  }
-  return amountValue.value.length == 0 ? 5 : amountValue.value.length;
 });
 
 const focus = () => {

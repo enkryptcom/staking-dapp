@@ -14,6 +14,7 @@
           :to="{ name: 'stake' }" 
           class="stake"
           :class="{ disabled: !wallet.connected.value }"
+          :disabled="!wallet.connected.value"
         >
           <span>Solana staking</span>
         </router-link>
@@ -21,6 +22,7 @@
           :to="{ name: 'portfolio' }" 
           class="portfolio"
           :class="{ disabled: !wallet.connected.value }"
+          :disabled="!wallet.connected.value"
         >
           <portfolio-icon />
           <span>My staking portfolio</span>
@@ -29,6 +31,8 @@
           :to="{ path: 'swap' }" 
           class="swap"
           :class="{ disabled: true }"
+          :disabled="true"
+          tabindex="-1"
         >
           <swap-icon />
           <span>Swap</span>
@@ -37,6 +41,8 @@
           :to="{ path: 'buy-crypto' }" 
           class="buy"
           :class="{ disabled: true }"
+          :disabled="true"
+          tabindex="-1"
         >
           <buy-icon />
           <span>Buy crypto</span>
@@ -71,6 +77,7 @@ a.disabled {
   pointer-events: none;
   color: @gray032 !important;
   cursor: not-allowed;
+  tab
 
   svg {
     opacity: 0.5 !important;

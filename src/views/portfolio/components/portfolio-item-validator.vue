@@ -54,7 +54,7 @@
         <!-- <base-button v-if="item.status === Statuses.EMPTY" title="Close" :stroke="true" :small="true" /> -->
         <!-- <base-button v-if="item.status === Statuses.INACTIVE" title="Stake" :small="true" /> -->
 
-        <a @click="moreAction" class="portfolio-item-validator__buttons-more">
+        <a @click="moreAction" class="portfolio-item-validator__buttons-more" href="javascript:void(0)">
           <more-icon />
           <div class="portfolio-item-validator__menu" v-on:click="detailsAction" :class="{ visible: isShowsMenu }" ref="menu">
             <a href="#">View in explorer</a>

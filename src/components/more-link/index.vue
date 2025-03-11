@@ -1,5 +1,5 @@
 <template>
-  <a class="more-link" @click="action()">
+  <a class="more-link" @click="action()" href="javascript:void(0)">
     {{ title }}
     <chevron-small-right />
   </a>
