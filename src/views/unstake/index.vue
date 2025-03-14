@@ -98,7 +98,7 @@ const nextAction = async () => {
     const base64Transaction = serializedTransaction?.toString('base64');
     const result = await store.dispatch(
       StakingTypes.START_DEACTIVATING_ACTION,
-      base64Transaction,
+      [base64Transaction, deactivatingStake.value.stakeAccount],
     );
     if (result) {
       isSendDone.value = true;

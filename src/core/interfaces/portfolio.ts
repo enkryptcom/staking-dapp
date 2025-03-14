@@ -32,6 +32,7 @@ export interface PortfolioItem {
   withdrawAuthority: string,
   provider: string,
   chain: string,
+  isEnabled: boolean,
 };
 
 export enum Statuses {

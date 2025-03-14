@@ -116,10 +116,6 @@ onMounted(async () => {
 
 const nextAction = async () => {
   isSend.value = true;
-  // await store.dispatch(
-  //   StakingTypes.START_WITHDRAW_ACTION,
-  // );
-  // isSendDone.value = true;
 
   try {
     const decodedTransaction = Buffer.from(withdrawData.value.unsignedTransaction, 'base64');
@@ -130,7 +126,7 @@ const nextAction = async () => {
     const base64Transaction = serializedTransaction?.toString('base64');
     const result = await store.dispatch(
       StakingTypes.START_WITHDRAW_ACTION,
-      base64Transaction,
+      [base64Transaction, withdrawStake.value.stakeAccount]
     );
     if (result) {
       isSendDone.value = true;
