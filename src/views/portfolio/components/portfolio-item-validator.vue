@@ -42,11 +42,13 @@
         <base-button v-if="item.status === Statuses.ACTIVE || item.status === Statuses.ACTIVATING"
           title="Unstake"
           :stroke="true"
+          :disabled="!item.isEnabled"
           :small="true"
           @click="() => unstakeAction(indexValue)"
         />
         <base-button v-if="item.status === Statuses.INACTIVE" 
           title="Withdraw"
+          :disabled="!item.isEnabled"
           :stroke="true"
           :small="true"
           @click="withdrawAction(indexValue)"
