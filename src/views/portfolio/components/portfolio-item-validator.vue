@@ -40,14 +40,14 @@
       </div>
       <div class="col-3 portfolio-item-validator__buttons">
         <base-button v-if="item.status === Statuses.ACTIVE || item.status === Statuses.ACTIVATING"
-          title="Unstake"
+          :title="`${item.isEnabled ? 'Unstake' : 'Unstaking'}`"
           :stroke="true"
           :disabled="!item.isEnabled"
           :small="true"
           @click="() => unstakeAction(indexValue)"
         />
         <base-button v-if="item.status === Statuses.INACTIVE" 
-          title="Withdraw"
+          :title="`${item.isEnabled ? 'Withdraw' : 'Withdrawing'}`"
           :disabled="!item.isEnabled"
           :stroke="true"
           :small="true"

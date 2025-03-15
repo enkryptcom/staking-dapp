@@ -105,6 +105,14 @@ const doneAction = () => {
     text-align: center;
     padding: 0 20%;
 
+    a {
+      color: @primaryLabel;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
     .screen-xs({
       padding: 0 16px;
     });

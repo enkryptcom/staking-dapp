@@ -19,7 +19,8 @@
 
     <buttons-block :is-space="true">
       <div class="stake-enter-amount__estimated">
-        <p class="stake-enter-amount__estimated-label">Estimated Returns in 1 year</p>
+        <p class="stake-enter-amount__estimated-label">Estimated Balance in 1 year</p>
+
         <p class="stake-enter-amount__estimated-coast">
           {{ $filters.cryptoCurrencyFormat(returns) }} <span>{{ BASE_TOKENS[activeChain].symbol }}</span>
         </p>

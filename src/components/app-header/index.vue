@@ -200,6 +200,7 @@ const toggleMenu = () => {
     display: block;
     .body1__Medium();
     color: @accent;
+    text-decoration: none;
   }
 
   &__get-enkrypt {
