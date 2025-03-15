@@ -30,7 +30,7 @@
               <div class="col-4">
                 <h6 class="portfolio-item__info-label">Avg. Yield</h6>
                 <p class="portfolio-item__info-value portfolio-item__info-value--regular">
-                  ~{{ $filters.percentFormat(item.avgRewards) }}
+                  ~{{ $filters.percentFormat(stakingItems[activeChain].apr) }}
                 </p>
                 <p class="portfolio-item__info-amount">&nbsp;</p>
               </div>
@@ -90,6 +90,7 @@ import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
 import { BASE_TOKENS } from "@/core/constants";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
+import { StakingTypes } from "@/store/modules/staking/consts";
 
 const router = useRouter();
 const store = useStore();
@@ -105,6 +106,7 @@ const props = defineProps({
 
 const prices = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const stakingItems = computed(() => store.getters[StakingTypes.STAKING_ITEMS_GETTER]);
 
 const totalStakedUsd = computed(() => {
   const price = prices.value?.[BASE_TOKENS[activeChain.value].symbol] || 0;

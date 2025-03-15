@@ -88,6 +88,18 @@ export const mutations = {
   emptyPortfolio(state: StakingState) {
     state.portfolio = {};
   },
+  disablePortfolioItem(state: StakingState, stakeAccount: string) {
+    for (const chain in state.portfolio) {
+      const portfolioByChain = state.portfolio[chain];
+      if (portfolioByChain) {
+        const item = portfolioByChain.items.find(item => item.stakeAccount === stakeAccount);
+        if (item) {
+          item.isEnabled = false;
+          break;
+        }
+      }
+    }
+  },  
   updateValidatorData(state: StakingState, [provider, chain, apy, fee]: [string, string, string, string]) {
     state.validators[provider][chain].apy = apy;
     state.validators[provider][chain].fee = fee;

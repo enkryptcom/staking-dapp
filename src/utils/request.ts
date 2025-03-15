@@ -41,6 +41,11 @@ export async function makeRequest<InputType, OutputType>({
       fetchParams
     );
 
+    if (response.status === 524) {
+      console.error("API request timed out (524)");
+      throw new Error("API request timed out (524)");
+    }
+
     if (!response.ok) {
       console.error(`API request failed with status ${response.status}`);
       throw new Error(`API request failed with status ${response.status}`);

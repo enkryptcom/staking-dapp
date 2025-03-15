@@ -8,7 +8,6 @@ import {
   stakeDeactivate,
   stakeWithdraw,
   getDelegatorRewards,
-  getDelegatorApy,
 } from "@/core/api";
 import { 
   CreateStakeRequest,
@@ -53,6 +52,11 @@ export const actions = {
 
       const createStakeResponse = await createStake(payload, chain, network);
 
+      if (createStakeResponse?.error) {
+        console.error(`API request failed with status: ${createStakeResponse?.error}`);
+        throw new Error("Something went wrong");
+      }
+
       const tx = Transaction.from(Buffer.from(createStakeResponse.result.unsignedTransaction, 'base64'));
       const fee = await walletService.getTransactionFee(tx) as number;
       commit("setStakingData", [createStakeResponse.result, fee / LAMPORTS_IN_SOL]);
@@ -80,6 +84,7 @@ export const actions = {
         const sendTxResponse = await sendTransaction(txPayload, chain, network);
 
         if (sendTxResponse?.error) {
+          console.error(`API request failed with status: ${sendTxResponse?.error}`);
           throw new Error("Something went wrong");
         }
         
@@ -132,6 +137,7 @@ export const actions = {
       const createStakeResponse = await stakeDeactivate(payload, chain, network);
 
       if (createStakeResponse?.error) {
+        console.error(`API request failed with status: ${createStakeResponse?.error}`);
         throw new Error("Something went wrong");
       }
 
@@ -149,7 +155,7 @@ export const actions = {
     state: StakingState,
     commit: Commit,
     rootGetters: any,
-  }, signedTransaction: string) {
+  }, [signedTransaction, stakeAccount]: [string, string]) {
     try {
       commit("updateLoadingState", true);
       const chain = rootGetters[SharedTypes.CHAIN_GETTER];
@@ -162,10 +168,12 @@ export const actions = {
         const sendTxResponse = await sendTransaction(txPayload, chain, network);
 
         if (sendTxResponse?.error) {
+          console.error(`API request failed with status: ${sendTxResponse?.error}`);
           throw new Error("Something went wrong");
         }
         
         commit("setTxId", sendTxResponse.result.transactionId);
+        commit("disablePortfolioItem", stakeAccount);
         const txStatus = await walletService.getTxStatus(sendTxResponse.result.transactionId);
 
         commit("updateLoadingState", false);
@@ -199,6 +207,7 @@ export const actions = {
       const createStakeResponse = await stakeWithdraw(payload, chain, network);
 
       if (createStakeResponse?.error) {
+        console.error(`API request failed with status: ${createStakeResponse?.error}`);
         throw new Error("Something went wrong");
       }
       
@@ -216,7 +225,7 @@ export const actions = {
     state: StakingState,
     commit: Commit,
     rootGetters: any,
-  }, signedTransaction: string) {
+  }, [signedTransaction, stakeAccount]: [string, string]) {
     commit("updateLoadingState", true);
     try {
       const chain = rootGetters[SharedTypes.CHAIN_GETTER];
@@ -228,10 +237,12 @@ export const actions = {
         const sendTxResponse = await sendTransaction(txPayload, chain, network);
 
         if (sendTxResponse?.error) {
+          console.error(`API request failed with status: ${sendTxResponse?.error}`);
           throw new Error("Something went wrong");
         }
         
         commit("setTxId", sendTxResponse.result.transactionId);
+        commit("disablePortfolioItem", stakeAccount);
         const txStatus = await walletService.getTxStatus(sendTxResponse.result.transactionId);
         commit("updateLoadingState", false);
 
@@ -245,7 +256,8 @@ export const actions = {
     }
   },
 
-  async loadStakingAccounts ({ commit, rootGetters, dispatch }: {
+  async loadStakingAccounts ({ state, commit, rootGetters, dispatch }: {
+    state: StakingState,
     commit: Commit,
     rootGetters: any,
     dispatch: Dispatch,
@@ -254,78 +266,87 @@ export const actions = {
     const network = rootGetters[SharedTypes.NETWORK_GETTER];
     const account = rootGetters[SharedTypes.WALLET_ACCOUNT_GETTER];
 
-    if (account) {
-
-      const payload: GetStakingAccountRequest = {
-        stakeAuthorities: [accountAddress],
-        withdrawAuthorities: [accountAddress],
-      };
-      let totalStaked = 0, totalRewards = 0;
-      const stakingData = getStorageStakingData();
-      if (stakingData) {
-        const data = JSON.parse(stakingData) as PortfolioByChain;
-        commit("setStakingAccounts", [data, chain]);
-      } else {
-        commit("updateLoadingState", true);
-      }
-
-      const stakingAccountsResponse = await getStakingAccount(payload, chain, network);
-      const items = [];
-
-      if (stakingAccountsResponse.result.accounts.length > 0) {
-        for(const acc of stakingAccountsResponse.result.accounts) {
-          const stakeAmount = acc.amount;
-          totalStaked += stakeAmount;
-
-          const delegatorRewards =  await getDelegatorRewards(chain, acc.stakeAccount);
-          let rewardSum = 0;
-          if (delegatorRewards.result.list.length > 0) {
-            for(const item of delegatorRewards.result.list) {
-              const listReward = item.rewards.reduce((accumulator, current) => accumulator + current.amount, 0);
-              rewardSum += listReward;
-            }
-            totalRewards += rewardSum;
-          }
-
-          const item: PortfolioItem = {
-            balance: stakeAmount,
-            reward: rewardSum,
-            status: acc.status,
-            stakeAccount: acc.stakeAccount,
-            stakeAuthority: acc.stakeAuthority,
-            voteAccount: acc.voteAccount,
-            withdrawAuthority: acc.withdrawAuthority,
-            provider: Providers.p2p,
-            chain: chain,
-          }
-    
-          items.push(item);
-        }
-
-        const delegatorApy =  await getDelegatorApy(chain, stakingAccountsResponse.result.accounts[0].stakeAccount);
-        const portfolioByChain: PortfolioByChain = {
-          items,
-          totalStaked,
-          totalRewards,
-          avgRewards: delegatorApy.result.list.length > 0 ? delegatorApy.result.list[0].grossApy : 0,
-          baseToken: BASE_TOKENS[chain],
+    try {
+      if (account) {
+        const payload: GetStakingAccountRequest = {
+          stakeAuthorities: [accountAddress],
+          withdrawAuthorities: [accountAddress],
         };
-    
-        saveStorageStakingAccounts(portfolioByChain);
-        
-        commit("setStakingAccounts", [portfolioByChain, chain]);
-      }
-    } else {
-      localStorage.removeItem("staking_accounts");
-      commit("emptyPortfolio");
-    }
-    commit("updateLoadingState", false);
+        let totalStaked = 0, totalRewards = 0;
+        const stakingData = getStorageStakingData();
+        if (stakingData) {
+          if (Object.keys(state.portfolio).length === 0) {
+            const data = JSON.parse(stakingData) as PortfolioByChain;
+            commit("setStakingAccounts", [data, chain]);
+          }
+        } else {
+          commit("updateLoadingState", true);
+        }
+        const stakingAccountsResponse = await getStakingAccount(payload, chain, network);
+        const items = [];
 
-    if (account) {
+        if (stakingAccountsResponse.result.accounts.length > 0) {
+          for(const acc of stakingAccountsResponse.result.accounts) {
+            const stakeAmount = acc.amount;
+            totalStaked += stakeAmount;
+
+            const delegatorRewards =  await getDelegatorRewards(chain, acc.stakeAccount);
+            let rewardSum = 0;
+            if (delegatorRewards.result.list.length > 0) {
+              for(const item of delegatorRewards.result.list) {
+                const listReward = item.rewards.reduce((accumulator, current) => accumulator + current.amount, 0);
+                rewardSum += listReward;
+              }
+              totalRewards += rewardSum;
+            }
+
+            const accInState = state.portfolio[chain].items.find((item) => {
+              return item.stakeAccount === acc.stakeAccount;
+            })
+
+            const item: PortfolioItem = {
+              balance: stakeAmount,
+              reward: rewardSum,
+              status: acc.status,
+              stakeAccount: acc.stakeAccount,
+              stakeAuthority: acc.stakeAuthority,
+              voteAccount: acc.voteAccount,
+              withdrawAuthority: acc.withdrawAuthority,
+              provider: Providers.p2p,
+              chain: chain,
+              isEnabled: accInState && acc.status === accInState.status ? accInState.isEnabled : true,
+            }
+      
+            items.push(item);
+          }
+          items.sort((a, b) => a.balance - b.balance);
+
+          const portfolioByChain: PortfolioByChain = {
+            items,
+            totalStaked,
+            totalRewards,
+            avgRewards: 0,
+            baseToken: BASE_TOKENS[chain],
+          };
+      
+          saveStorageStakingAccounts(portfolioByChain);
+          
+          commit("setStakingAccounts", [portfolioByChain, chain]);
+        }
+      } else {
+        localStorage.removeItem("staking_accounts");
+        commit("emptyPortfolio");
+      }
+      setTimeout(async () => {
+        await dispatch("loadStakingAccounts", accountAddress);
+      }, 15000);
+    } catch (e) {
+      console.error(`API request failed with status: ${e}`);
       setTimeout(async () => {
         await dispatch("loadStakingAccounts", accountAddress);
       }, 15000);
     }
+    commit("updateLoadingState", false);
   },
 
   async emptyStakingAccountsAction ({ commit }: {
