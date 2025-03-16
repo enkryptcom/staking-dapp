@@ -104,6 +104,14 @@ const doneAction = () => {
     margin: 0;
     text-align: center;
     padding: 0 20%;
+
+    a {
+      color: @primaryLabel;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
   }
 
   .base-button {
