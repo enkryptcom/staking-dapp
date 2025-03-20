@@ -74,9 +74,14 @@ const isWalletModalOpen = computed(() => store.getters[SharedTypes.IS_CONNECT_MO
 
 watch(
   () => wallet.publicKey?.value,
-  (newVal) => {
+  (newVal, oldVal) => {
     if (newVal) {
+      if (oldVal && newVal.toString() !== oldVal.toString()) {
+        store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
+      }
       store.dispatch(SharedTypes.CONNECTED_WALLET_ACTION, wallet.publicKey.value?.toString());
+    } else if (oldVal && !newVal) {
+      store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
     }
   },
   { immediate: true }
