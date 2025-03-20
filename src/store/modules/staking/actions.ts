@@ -24,11 +24,12 @@ import WalletService from "@/core/services/walletService";
 import { SharedTypes } from "@/store/shared/consts";
 import { BASE_TOKENS } from "@/core/constants";
 import { LAMPORTS_IN_SOL, SOL_FEE } from "@/core/constants";
-import { getStorageStakingData, saveStorageStakingAccounts } from "@/utils/storage";
+import { deleteStorageStakingData, getStorageStakingData, saveStorageStakingAccounts } from "@/utils/storage";
 
 import { StakingState } from "./mutations";
 
 const walletService = WalletService.getInstance();
+let portfolioUpdateTimeout: ReturnType<typeof setTimeout> | undefined;
 
 export const actions = {
   async createStakeAction ({ state, commit, rootGetters }: { 
@@ -107,7 +108,7 @@ export const actions = {
     rootGetters: any,
   }, index: number ) {
     const chain = rootGetters[SharedTypes.CHAIN_GETTER];
-    commit("setDeactivatingStake", state.portfolio[chain].items[index]);
+    commit("setDeactivatingStake", state?.portfolio[chain]?.items[index]);
   },
 
   async setWithdrawStakeAction ({ state, commit, rootGetters }: { 
@@ -116,7 +117,7 @@ export const actions = {
     rootGetters: any,
   }, index: number ) {
     const chain = rootGetters[SharedTypes.CHAIN_GETTER];
-    commit("setWithdrawStake", state.portfolio[chain].items[index]);
+    commit("setWithdrawStake", state?.portfolio[chain]?.items[index]);
   },
 
   async deactivateStakeAction ({ commit, rootGetters }: { 
@@ -285,7 +286,7 @@ export const actions = {
         const stakingAccountsResponse = await getStakingAccount(payload, chain, network);
         const items = [];
 
-        if (stakingAccountsResponse.result.accounts.length > 0) {
+        if (stakingAccountsResponse?.result?.accounts?.length > 0) {
           for(const acc of stakingAccountsResponse.result.accounts) {
             const stakeAmount = acc.amount;
             totalStaked += stakeAmount;
@@ -300,9 +301,9 @@ export const actions = {
               totalRewards += rewardSum;
             }
 
-            const accInState = state.portfolio[chain].items.find((item) => {
+            const accInState = state?.portfolio[chain]?.items.find((item) => {
               return item.stakeAccount === acc.stakeAccount;
-            })
+            });
 
             const item: PortfolioItem = {
               balance: stakeAmount,
@@ -332,17 +333,20 @@ export const actions = {
           saveStorageStakingAccounts(portfolioByChain);
           
           commit("setStakingAccounts", [portfolioByChain, chain]);
+        } else {
+          deleteStorageStakingData();
+          commit("emptyPortfolio");
         }
       } else {
         localStorage.removeItem("staking_accounts");
         commit("emptyPortfolio");
       }
-      setTimeout(async () => {
+      portfolioUpdateTimeout = setTimeout(async () => {
         await dispatch("loadStakingAccounts", accountAddress);
       }, 15000);
     } catch (e) {
       console.error(`API request failed with status: ${e}`);
-      setTimeout(async () => {
+      portfolioUpdateTimeout = setTimeout(async () => {
         await dispatch("loadStakingAccounts", accountAddress);
       }, 15000);
     }
@@ -352,6 +356,10 @@ export const actions = {
   async emptyStakingAccountsAction ({ commit }: {
     commit: Commit,
   }) {
+    if (portfolioUpdateTimeout) {
+      clearTimeout(portfolioUpdateTimeout);
+      portfolioUpdateTimeout = undefined;
+    }
     localStorage.removeItem("staking_accounts");
     commit("emptyPortfolio");
   },
