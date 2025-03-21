@@ -31,6 +31,7 @@ export const cryptoCurrencyFormat = (value: number): string => {
   }
   const formatter = new Intl.NumberFormat("en-US", {
     style: "decimal",
+    maximumFractionDigits: 5,
   });
   return formatter.format(value);
 };
