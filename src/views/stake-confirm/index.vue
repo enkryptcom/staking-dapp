@@ -101,9 +101,11 @@ const nextAction = async () => {
     const signedTransaction = await wallet.signTransaction.value?.(transaction);
     const serializedTransaction = signedTransaction?.serialize();
     const base64Transaction = serializedTransaction?.toString('base64');
-    
-    await store.dispatch(StakingTypes.START_STAKE_ACTION, base64Transaction);
-    isSendDone.value = true;
+
+    const result = await store.dispatch(StakingTypes.START_STAKE_ACTION, base64Transaction);
+    if (result) {
+      isSendDone.value = true;
+    }
   } catch (error) {
     console.error("Error:", error);
     isError.value = true;
