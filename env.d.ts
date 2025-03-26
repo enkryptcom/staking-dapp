@@ -6,3 +6,6 @@ declare module "*.vue" {
   const component: DefineComponent<{}, {}, any>
   export default component;
 }
+
+declare let __PACKAGE_VERSION__: string;
+declare let __IS_DEV__: boolean;

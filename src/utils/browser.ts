@@ -1,18 +1,46 @@
-export const detect = (): string => {
-  const userAgent = navigator.userAgent;
-  let browserName;
+export const BROWSER_NAMES = {
+  chrome: 'chrome',
+  firefox: 'firefox',
+  brave: 'brave',
+  edge: 'edge',
+  opera: 'opera',
+  safari: 'safari',
+};
 
-  if (userAgent.match(/chrome|chromium|crios/i)) {
-    browserName = "chrome";
-  } else if (userAgent.match(/firefox|fxios/i)) {
-    browserName = "firefox";
-  } else if (userAgent.match(/edg/i)) {
-    browserName = "edge";
-  } else {
-    browserName = "no";
+export const detectOS = (): string => {
+  const platform = navigator.platform;
+    let osName = "Unknown OS";
+
+    if (platform.includes("Win")) { 
+        osName = "Windows";
+    } else if (platform.includes("Mac")) { 
+        osName = "MacOS";
+    } else if (platform.includes("X11") || platform.includes("Linux")) { 
+        osName = "Linux";
+    }
+
+    return osName;
+};
+
+export const detectBrowser = (): string => {
+  const { userAgent } = navigator;
+
+  if (userAgent.match(/^((?!chrome|android).)*safari/i)) {
+    return BROWSER_NAMES.safari;
   }
-
-  return browserName;
+  if (userAgent.match(/Opera|OPR/i)) {
+    return BROWSER_NAMES.opera;
+  }
+  if (userAgent.match(/edg/i)) {
+    return BROWSER_NAMES.edge;
+  }
+  if (userAgent.match(/chrome|chromium|crios/i)) {
+    return BROWSER_NAMES.chrome;
+  }
+  if (userAgent.match(/firefox|fxios/i)) {
+    return BROWSER_NAMES.firefox;
+  }
+  return '';
 };
 
 export const copyToClipboard = async (textToCopy: string) => {

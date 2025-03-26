@@ -91,6 +91,8 @@ import { SharedTypes } from "@/store/shared/consts";
 import { BASE_TOKENS } from "@/core/constants";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
 import { StakingTypes } from "@/store/modules/staking/consts";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -122,6 +124,7 @@ const toggle = () => {
 };
 
 const onStakeMoreClicked = (e: Event) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenStakeMoreButtonClicked);
   e.stopPropagation();
   router.push({ name: "stake" });
 }

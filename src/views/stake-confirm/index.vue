@@ -66,6 +66,8 @@ import { BASE_TOKENS } from "@/core/constants";
 import { useWallet } from "solana-wallets-vue";
 import { Transaction } from "@solana/web3.js";
 import { Buffer } from "buffer";
+import { trackScreenEvents, trackButtonsEvents } from '@/libs/metrics';
+import { ScreenEventType, ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -86,6 +88,8 @@ const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
 const error = computed(() => store.getters[StakingTypes.ERROR_GETTER]);
 const fee = computed(() => store.getters[StakingTypes.STAKING_FEE_GETTER]);
 
+trackScreenEvents(ScreenEventType.StackingConfirmScreenShown);
+
 onMounted(async () => {
   if (amountValue.value === null) {
     back();
@@ -94,6 +98,8 @@ onMounted(async () => {
 
 const nextAction = async () => {
   isSend.value = true;
+  trackButtonsEvents(ButtonsActionEventType.StakingConfirmScreenStakeButtonClicked);
+  trackScreenEvents(ScreenEventType.StackingProcessScreenShown);
 
   try {
     const decodedTransaction = Buffer.from(stakingData.value.unsignedTransaction, 'base64');
@@ -104,6 +110,7 @@ const nextAction = async () => {
     
     await store.dispatch(StakingTypes.START_STAKE_ACTION, base64Transaction);
     isSendDone.value = true;
+    trackScreenEvents(ScreenEventType.StackingDoneScreenShown);
   } catch (error) {
     console.error("Error:", error);
     isError.value = true;
@@ -111,6 +118,7 @@ const nextAction = async () => {
 };
 
 const back = () => {
+  trackButtonsEvents(ButtonsActionEventType.StakingConfirmScreenBackButtonClicked);
   router.go(-1);
 };
 </script>

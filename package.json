@@ -12,6 +12,7 @@
     "publish": "git push origin `git subtree split --prefix dist main`:gh-pages --force"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.11",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.98.0",
     "@vueuse/core": "^11.3.0",

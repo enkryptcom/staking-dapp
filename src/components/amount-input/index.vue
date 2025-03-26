@@ -49,6 +49,8 @@ import { SharedTypes } from "@/store/shared/consts";
 import { useStore } from "vuex";
 import { BASE_TOKENS } from "@/core/constants";
 import { Token } from "@/core/interfaces";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const store = useStore();
 
@@ -132,6 +134,7 @@ const focus = () => {
 };
 
 const onMaxClicked = () => {
+  trackButtonsEvents(ButtonsActionEventType.StakingScreenMaxButtonClicked);
   amountValue.value = props.maxValue.toString();
 };
 </script>

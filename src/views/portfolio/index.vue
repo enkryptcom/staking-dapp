@@ -24,11 +24,15 @@ import SpinnerAnimation from "@/icons/animation/spinner.vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import { trackScreenEvents } from '@/libs/metrics';
+import { ScreenEventType } from '@/libs/metrics/types';
 
 const store = useStore();
 
 const portfolio = computed(() => store.getters[StakingTypes.PORTFOLIO_GETTER]);
 const isLoading = computed(() => store.getters[StakingTypes.IS_LOADING_GETTER]);
+
+trackScreenEvents(ScreenEventType.PortfolioScreenShown);
 
 onMounted(async () => {
   await store.dispatch(

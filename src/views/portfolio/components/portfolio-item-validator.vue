@@ -83,6 +83,8 @@ import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
 import { openSolscanExplorerAddress } from "@/utils/browser";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -170,16 +172,19 @@ onClickOutside(menu, () => {
 });
 
 const unstakeAction = async (index: number) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenUnstakeButtonButtoClicked);
   store.dispatch(StakingTypes.SET_DEACTIVATING_STAKE_ACTION, index);
   router.push({ name: 'unstake' });
 };
 
 const withdrawAction = async (index: number) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenWithdrawButtonClicked);
   store.dispatch(StakingTypes.SET_WITHDRAW_STAKE_ACTION, index);
   router.push({ name: 'withdraw' });
 };
 
 const detailsAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenViewInExploreButtonClicked);
   openSolscanExplorerAddress(props.item.stakeAccount, network.value);
 };
 
