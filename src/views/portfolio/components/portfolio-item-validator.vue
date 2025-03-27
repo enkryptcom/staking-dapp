@@ -32,8 +32,9 @@
             <h3 class="text">
               Reward
             </h3>
-            <h3 class="portfolio-item-validator__info-amount" :class="amountClassObject">
+            <h3 class="portfolio-item-validator__info-amount portfolio-item-validator__info-amount--flex" :class="amountClassObject">
               {{ $filters.cryptoCurrencyFormat(item.reward) }} <span>{{ token?.symbol }}</span>
+              <info-tooltip  :text="rewardInfoTooltipText" :is-big-text="true" :is-right="true" />
             </h3>
           </div>
         </div>
@@ -140,6 +141,8 @@ const infoTooltipText = computed(() => {
 
   return "Your SOL is currently staked with a validator. You'll need to unstake to access these funds"
 });
+
+const rewardInfoTooltipText = "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
 
 const validator = computed(() => {
   return validators[props.item.provider][activeChain.value];
@@ -332,6 +335,16 @@ const detailsAction = () => {
 
         &::before {
           content: "+";
+        }
+      }
+
+      &--flex {
+        display: flex;
+        align-items: center;
+        justify-content: end !important;
+
+        .info-tooltip {
+          margin-left: 4px;
         }
       }
     }

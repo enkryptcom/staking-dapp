@@ -13,7 +13,7 @@
     </div>
   </div>
   <a href="https://solana.com/validators" target="_blank" rel="noopener noreferrer" class="validator-info__info">
-    <info-icon />
+    <info-tooltip :text="infoTooltipText" :is-big-icon="true" :is-big-text="true" />
     <span>What is a validator?</span>
   </a>
 </template>
@@ -21,7 +21,9 @@
 <script setup lang="ts">
 import { ValidatorByChain } from "@/core/interfaces";
 import { PropType } from "vue";
-import InfoIcon from "@/icons/common/info-icon.vue";
+import InfoTooltip from "@/components/info-tooltip/index.vue";
+
+const infoTooltipText = "Validators form the backbone of Solana’s network. By processing transactions and participating in consensus, each validator helps make Solana the most high-performance blockchain network in the world.<br /><br />More info on <a href='https://solana.com/' target='_blank'>Solana official website</a>";
 
 defineProps({
   validator: {
@@ -106,7 +108,7 @@ defineProps({
     color: @secondaryLabel;
     padding-left: 32px;
 
-    svg {
+    .info-tooltip {
       margin-right: 12px;
     }
 

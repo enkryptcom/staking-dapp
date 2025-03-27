@@ -22,6 +22,7 @@
         placeholder="0"
         :class="{ error: isMinValue && props.value != '0' }"
         oninput="this.size = this.value.length"
+        id="amount-input"
       />
       <span v-show="props.value != '0'" @click="focus" :class="{ error: isMinValue }">{{ token.symbol }}</span>
     </div>
@@ -136,6 +137,10 @@ const focus = () => {
 const onMaxClicked = () => {
   trackButtonsEvents(ButtonsActionEventType.StakingScreenMaxButtonClicked);
   amountValue.value = props.maxValue.toString();
+
+  if (inputRef.value) {
+    inputRef.value.size = props.maxValue.toString().length;
+  }
 };
 </script>
 

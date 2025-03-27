@@ -15,7 +15,7 @@
       <error-animation />
       <h3>Something went wrong...</h3>
       <p>We’re sorry, but it looks like there’s been an error. Please refresh the page or try again later.</p>
-      <p>If the error persists, please <a href="mailto:support@enkrypt.com?subject=Enkrypt Staking Dapp Enquiry">contact support</a></p>
+      <p>If the error persists, please <a href="javascript:void(0)" @click="openContactSupport">contact support</a></p>
     </div>
     <div class="stake-confirm-process__button">
       <base-button title="Go Back" :action="backAction" :send="true" />
@@ -40,7 +40,7 @@ import { computed } from "vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerTransaction } from "@/utils/browser";
+import { openSolscanExplorerTransaction, openContactSupport } from "@/utils/browser";
 import { trackButtonsEvents, trackScreenEvents } from '@/libs/metrics';
 import { ButtonsActionEventType, ScreenEventType } from '@/libs/metrics/types';
 

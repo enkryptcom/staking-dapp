@@ -1,46 +1,26 @@
+import platform from "platform";
+
 export const BROWSER_NAMES = {
-  chrome: 'chrome',
-  firefox: 'firefox',
-  brave: 'brave',
-  edge: 'edge',
-  opera: 'opera',
-  safari: 'safari',
+  chrome: 'Chrome',
+  firefox: 'Firefox',
+  brave: 'Brave',
+  edge: 'Edge',
+  opera: 'Opera',
+  safari: 'Safari',
 };
 
 export const detectOS = (): string => {
-  const platform = navigator.platform;
-    let osName = "Unknown OS";
+  const { userAgent } = navigator;
+  const info = platform.parse(userAgent);
 
-    if (platform.includes("Win")) { 
-        osName = "Windows";
-    } else if (platform.includes("Mac")) { 
-        osName = "MacOS";
-    } else if (platform.includes("X11") || platform.includes("Linux")) { 
-        osName = "Linux";
-    }
-
-    return osName;
+  return info.os;
 };
 
 export const detectBrowser = (): string => {
   const { userAgent } = navigator;
+  const info = platform.parse(userAgent);
 
-  if (userAgent.match(/^((?!chrome|android).)*safari/i)) {
-    return BROWSER_NAMES.safari;
-  }
-  if (userAgent.match(/Opera|OPR/i)) {
-    return BROWSER_NAMES.opera;
-  }
-  if (userAgent.match(/edg/i)) {
-    return BROWSER_NAMES.edge;
-  }
-  if (userAgent.match(/chrome|chromium|crios/i)) {
-    return BROWSER_NAMES.chrome;
-  }
-  if (userAgent.match(/firefox|fxios/i)) {
-    return BROWSER_NAMES.firefox;
-  }
-  return '';
+  return `${info.name} ${info.version}` ;
 };
 
 export const copyToClipboard = async (textToCopy: string) => {
@@ -58,4 +38,8 @@ export const openSolscanExplorerAddress = (address: string, cluster: string) => 
 
 export const openSolscanExplorerTransaction = (id: string, cluster: string) => {
   window.open(`https://solscan.io/tx/${id}?cluster=${cluster}`, '_blank');
+}
+
+export const openContactSupport = () => {
+  window.open(`mailto:support@enkrypt.com?subject=Enkrypt Staking Dapp Enquiry - ${__PACKAGE_VERSION__} - ${detectBrowser()} - ${detectOS()}`, '_blank');
 }

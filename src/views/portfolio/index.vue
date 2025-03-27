@@ -6,6 +6,7 @@
           v-for="(item, index) in portfolio"
           :key="index"
           :item="item"
+          :is-first="index == Object.keys(portfolio)[0]"
         ></portfolio-item>
       </div>
       <div class="portfolio__empty" v-else-if="!Object.keys(portfolio).length && !isLoading">
@@ -31,6 +32,8 @@ const store = useStore();
 
 const portfolio = computed(() => store.getters[StakingTypes.PORTFOLIO_GETTER]);
 const isLoading = computed(() => store.getters[StakingTypes.IS_LOADING_GETTER]);
+
+console.log(Object.keys(portfolio.value))
 
 trackScreenEvents(ScreenEventType.PortfolioScreenShown);
 

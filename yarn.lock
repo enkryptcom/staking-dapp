@@ -8758,6 +8758,11 @@ pkg-dir@^4.1.0:
   dependencies:
     find-up "^4.0.0"
 
+platform@^1.3.6:
+  version "1.3.6"
+  resolved "https://registry.npmjs.org/platform/-/platform-1.3.6.tgz"
+  integrity sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==
+
 pngjs@^3.3.0:
   version "3.4.0"
 
