@@ -16,7 +16,7 @@
           :class="{ disabled: !wallet.connected.value }"
           :disabled="!wallet.connected.value"
         >
-          <span>Solana staking</span>
+          <span>Stake Solana</span>
         </router-link>
         <router-link 
           :to="{ name: 'portfolio' }" 
@@ -27,7 +27,7 @@
           <portfolio-icon />
           <span>My staking portfolio</span>
         </router-link>
-        <router-link 
+        <!-- <router-link 
           :to="{ path: 'swap' }" 
           class="swap"
           :class="{ disabled: true }"
@@ -36,7 +36,7 @@
         >
           <swap-icon />
           <span>Swap</span>
-        </router-link>
+        </router-link> -->
         <router-link 
           :to="{ path: 'buy-crypto' }" 
           class="buy"
@@ -45,7 +45,7 @@
           tabindex="-1"
         >
           <buy-icon />
-          <span>Buy crypto</span>
+          <span>Buy SOL</span>
         </router-link>
       </div>
     </div>
@@ -56,7 +56,6 @@
 <script setup lang="ts">
 import HomeIcon from "@/icons/menu/home-icon.vue";
 import PortfolioIcon from "@/icons/menu/portfolio-icon.vue";
-import SwapIcon from "@/icons/menu/swap-icon.vue";
 import BuyIcon from "@/icons/menu/buy-icon.vue";
 import { useWallet } from "solana-wallets-vue";
 
