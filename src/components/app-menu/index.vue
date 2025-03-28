@@ -37,16 +37,14 @@
           <swap-icon />
           <span>Swap</span>
         </router-link> -->
-        <router-link 
-          :to="{ path: 'buy-crypto' }" 
+        <a 
+          href="https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt" 
           class="buy"
-          :class="{ disabled: true }"
-          :disabled="true"
-          tabindex="-1"
+          target="_blank"
         >
           <buy-icon />
           <span>Buy SOL</span>
-        </router-link>
+        </a>
       </div>
     </div>
   </div>
