@@ -1,5 +1,8 @@
 <template>
-  <CommonModal :isVisible="isModalVisible" @update:isVisible="updateModalVisibility">
+  <CommonModal
+    :isVisible="isModalVisible"
+    @update:isVisible="updateModalVisibility"
+  >
     <template #header>
       <h3>Select Wallet</h3>
     </template>
@@ -14,15 +17,27 @@
               :key="wallet.adapter.name"
               @click="connectWallet(wallet)"
             >
-              <img :src="wallet.adapter.icon" alt="wallet icon" class="wallet-icon" />
+              <img
+                :src="wallet.adapter.icon"
+                alt="wallet icon"
+                class="wallet-icon"
+              />
               {{ wallet.adapter.name }}
-              <span v-if="wallet.adapter.readyState !== 'Installed'" class="wallet-status">
+              <span
+                v-if="wallet.adapter.readyState !== 'Installed'"
+                class="wallet-status"
+              >
                 ({{ wallet.adapter.readyState }})
               </span>
             </li>
           </ul>
 
-          <base-button :title="`Install Enkrypt Wallet`" v-else :send="true" @click="installEnkryptClicked()"></base-button>
+          <base-button
+            :title="`Install Enkrypt Wallet`"
+            v-else
+            :send="true"
+            @click="installEnkryptClicked()"
+          ></base-button>
         </div>
       </div>
     </template>
@@ -38,23 +53,30 @@ import CommonModal from "@/components/common-modal/index.vue";
 import BaseButton from "@/components/base-button/index.vue";
 import { ref, watch, computed } from "vue";
 import { useWallet } from "solana-wallets-vue";
-import { Wallet } from "solana-wallets-vue/dist/types/Wallet";
+import type { Adapter, WalletReadyState } from "@solana/wallet-adapter-base";
+
+export type Wallet = {
+  adapter: Adapter;
+  readyState: WalletReadyState;
+};
 
 const wallet = useWallet();
 
 const installedWallets = computed(() => {
   const availableWallets = wallet.wallets ?? [];
-  return availableWallets.value.filter(
-    (wallet: Wallet) =>
-      wallet.adapter.readyState === 'Installed' ||
-      wallet.adapter.readyState === 'Loadable'
-  ).sort((a: Wallet, b: Wallet) => {
-    if (a.adapter.name == "Enkrypt") {
-      return -1;
-    }
+  return availableWallets.value
+    .filter(
+      (wallet: Wallet) =>
+        wallet.adapter.readyState === "Installed" ||
+        wallet.adapter.readyState === "Loadable"
+    )
+    .sort((a: Wallet, b: Wallet) => {
+      if (a.adapter.name == "Enkrypt") {
+        return -1;
+      }
 
-    return 0
-  });
+      return 0;
+    });
 });
 const props = defineProps({
   isVisible: {
@@ -77,8 +99,8 @@ const updateModalVisibility = (visible: boolean) => {
 };
 
 const installEnkryptClicked = () => {
-  window.open("https://www.enkrypt.com/", '_blank');
-}
+  window.open("https://www.enkrypt.com/", "_blank");
+};
 
 const connectWallet = async (selectedWallet: any) => {
   isModalVisible.value = false;
@@ -86,22 +108,23 @@ const connectWallet = async (selectedWallet: any) => {
     await wallet.select(selectedWallet.adapter.name);
     await wallet.connect();
   } catch (err) {
-    console.error('Wallet connection failed:', err);
+    console.error("Wallet connection failed:", err);
   }
   emit("update:isVisible", false);
 };
 
-watch(() => props.isVisible, (newValue) => {
-  isModalVisible.value = newValue;
-});
-
+watch(
+  () => props.isVisible,
+  (newValue) => {
+    isModalVisible.value = newValue;
+  }
+);
 </script>
 
 <style lang="less" scoped>
 @import "@/assets/styles/theme.less";
 
 .wallet-modal {
-
   &__content {
     display: flex;
     flex-direction: column;
@@ -126,7 +149,7 @@ watch(() => props.isVisible, (newValue) => {
         align-items: center;
         margin-bottom: 20px;
         cursor: pointer;
-        color: #684CFF;
+        color: #684cff;
         background-color: rgba(104, 76, 255, 0.1);
       }
     }

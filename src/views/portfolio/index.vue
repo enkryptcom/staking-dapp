@@ -1,20 +1,23 @@
 <template>
   <div class="portfolio">
     <h2 class="portfolio__title">My staking portfolio</h2>
-      <div v-if="Object.keys(portfolio).length && !isLoading">
-        <portfolio-item
-          v-for="(item, index) in portfolio"
-          :key="index"
-          :item="item"
-        ></portfolio-item>
-      </div>
-      <div class="portfolio__empty" v-else-if="!Object.keys(portfolio).length && !isLoading">
-        There are no active stakes.
-      </div>
-      <div class="portfolio__loader" v-if="isLoading">
-        <spinner-animation />
-      </div>
-      
+    <div v-if="Object.keys(portfolio).length && !isLoading">
+      <portfolio-item
+        v-for="(item, index) in portfolio"
+        :key="index"
+        :item="item"
+        :is-first="index.toString() == Object.keys(portfolio)[0]"
+      ></portfolio-item>
+    </div>
+    <div
+      class="portfolio__empty"
+      v-else-if="!Object.keys(portfolio).length && !isLoading"
+    >
+      There are no active stakes.
+    </div>
+    <div class="portfolio__loader" v-if="isLoading">
+      <spinner-animation />
+    </div>
   </div>
 </template>
 
@@ -24,19 +27,21 @@ import SpinnerAnimation from "@/icons/animation/spinner.vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
+import { trackScreenEvents } from "@/libs/metrics";
+import { ScreenEventType } from "@/libs/metrics/types";
 
 const store = useStore();
 
 const portfolio = computed(() => store.getters[StakingTypes.PORTFOLIO_GETTER]);
 const isLoading = computed(() => store.getters[StakingTypes.IS_LOADING_GETTER]);
 
-onMounted(async () => {
-  await store.dispatch(
-    StakingTypes.SET_ERROR_STATE, 
-    null,
-  );
-});
+console.log(Object.keys(portfolio.value));
 
+trackScreenEvents(ScreenEventType.PortfolioScreenShown);
+
+onMounted(async () => {
+  await store.dispatch(StakingTypes.SET_ERROR_STATE, null);
+});
 </script>
 
 <style lang="less" scoped>

@@ -63,6 +63,8 @@ import { SharedTypes } from "@/store/shared/consts";
 import { chainsData } from "@/core/constants/index";
 import { ChainDataItem, Chains } from "@/core/interfaces";
 import { useWallet } from "solana-wallets-vue";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const store = useStore();
 const router = useRouter();
@@ -88,6 +90,7 @@ watch(
 );
 
 const openWalletModal = () => {
+  trackButtonsEvents(ButtonsActionEventType.MainScreenConnectButtonClicked);
   store.dispatch(SharedTypes.CONNECT_MODAL_ACTION, true);
 };
 
@@ -96,6 +99,7 @@ const updateWalletModalVisibility = (visible: boolean) => {
 };
 
 const disconnectWallet = async () => {
+  trackButtonsEvents(ButtonsActionEventType.MainScreenDisconnectButtonClicked);
   try {
     if (wallet.connected.value) {
       await store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);

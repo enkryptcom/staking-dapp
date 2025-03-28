@@ -55,6 +55,8 @@ import { SharedTypes } from "@/store/shared/consts";
 import { SVGRenderer } from 'echarts/renderers';;
 import { TooltipComponent, GridComponent } from 'echarts/components';
 import { formatValue } from "@/core/utils";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -121,10 +123,12 @@ const option = computed(() => {
 });
 
 const startAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.MainScreenStakeButtonClicked);
   router.push({ name: "stake" });
 };
 
 const buyAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.MainScreenBuyButtonClicked);
   window.open("https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt", '_blank');
 };
 

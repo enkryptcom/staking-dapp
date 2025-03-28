@@ -54,6 +54,8 @@ import { SharedTypes } from "@/store/shared/consts";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { Chains, Providers, Token } from "@/core/interfaces";
 import { BASE_TOKENS } from "@/core/constants";
+import { trackScreenEvents, trackButtonsEvents } from '@/libs/metrics';
+import { ScreenEventType, ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -76,6 +78,8 @@ const returnsUSD = computed(() => {
 const amount = ref<number>(0);
 const nativeToken = ref<Token>(BASE_TOKENS[Chains.SOLANA]);
 const minAmount = ref<number>(1.003);
+
+trackScreenEvents(ScreenEventType.StackingScreenShown);
 
 onMounted(async () => {
    await store.dispatch(
@@ -109,6 +113,7 @@ const hasEnough = computed(() => {
 });
 
 const nextAction = async () => {
+  trackButtonsEvents(ButtonsActionEventType.StakingScreenContinueButtonClicked);
   await store.dispatch(StakingTypes.CREATE_STAKE_ACTION, [walletAccount.value.address, walletBalance.value]);
   router.push({
     name: "stake-confirm",
@@ -116,6 +121,7 @@ const nextAction = async () => {
 };
 
 const back = () => {
+  trackButtonsEvents(ButtonsActionEventType.StakingScreenBackButtonClicked);
   router.go(-1);
 };
 

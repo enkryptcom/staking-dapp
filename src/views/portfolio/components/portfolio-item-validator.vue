@@ -32,8 +32,9 @@
             <h3 class="text">
               Reward
             </h3>
-            <h3 class="portfolio-item-validator__info-amount" :class="amountClassObject">
+            <h3 class="portfolio-item-validator__info-amount portfolio-item-validator__info-amount--flex" :class="amountClassObject">
               {{ $filters.cryptoCurrencyFormat(item.reward) }} <span>{{ token?.symbol }}</span>
+              <info-tooltip  :text="rewardInfoTooltipText" :is-big-text="true" :is-right="true" />
             </h3>
           </div>
         </div>
@@ -83,6 +84,8 @@ import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
 import { openSolscanExplorerAddress } from "@/utils/browser";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -139,6 +142,8 @@ const infoTooltipText = computed(() => {
   return "Your SOL is currently staked with a validator. You'll need to unstake to access these funds"
 });
 
+const rewardInfoTooltipText = "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
+
 const validator = computed(() => {
   return validators[props.item.provider][activeChain.value];
 });
@@ -170,16 +175,19 @@ onClickOutside(menu, () => {
 });
 
 const unstakeAction = async (index: number) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenUnstakeButtonButtoClicked);
   store.dispatch(StakingTypes.SET_DEACTIVATING_STAKE_ACTION, index);
   router.push({ name: 'unstake' });
 };
 
 const withdrawAction = async (index: number) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenWithdrawButtonClicked);
   store.dispatch(StakingTypes.SET_WITHDRAW_STAKE_ACTION, index);
   router.push({ name: 'withdraw' });
 };
 
 const detailsAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenViewInExploreButtonClicked);
   openSolscanExplorerAddress(props.item.stakeAccount, network.value);
 };
 
@@ -327,6 +335,16 @@ const detailsAction = () => {
 
         &::before {
           content: "+";
+        }
+      }
+
+      &--flex {
+        display: flex;
+        align-items: center;
+        justify-content: end !important;
+
+        .info-tooltip {
+          margin-left: 4px;
         }
       }
     }

@@ -74,6 +74,8 @@ import { useWallet } from "solana-wallets-vue";
 import { Transaction } from "@solana/web3.js";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
 import { Buffer } from "buffer";
+import { trackScreenEvents, trackButtonsEvents } from '@/libs/metrics';
+import { ScreenEventType, ButtonsActionEventType } from '@/libs/metrics/types';
 
 const router = useRouter();
 const store = useStore();
@@ -94,6 +96,8 @@ const withdrawData = computed(() => store.getters[StakingTypes.WITHDRAW_DATA_GET
 const isPreLoading = computed(() => store.getters[StakingTypes.IS_LOADING_GETTER]);
 const error = computed(() => store.getters[StakingTypes.ERROR_GETTER]);
 const fee = computed(() => store.getters[StakingTypes.WITHDRAW_FEE_GETTER]);
+
+trackScreenEvents(ScreenEventType.WithdrawScreenShown);
 
 onMounted(async () => {
   isLoading.value = true;
@@ -116,6 +120,8 @@ onMounted(async () => {
 
 const nextAction = async () => {
   isSend.value = true;
+  trackButtonsEvents(ButtonsActionEventType.WithdrawScreenWithdrawButtonClicked);
+  trackScreenEvents(ScreenEventType.WithdrawProcessScreenShown);
 
   try {
     const decodedTransaction = Buffer.from(withdrawData.value.unsignedTransaction, 'base64');
@@ -130,6 +136,7 @@ const nextAction = async () => {
     );
     if (result) {
       isSendDone.value = true;
+      trackScreenEvents(ScreenEventType.WithdrawDoneScreenShown);
     }
   } catch (error) {
     console.error("Error:", error);
@@ -138,6 +145,7 @@ const nextAction = async () => {
 };
 
 const back = () => {
+  trackButtonsEvents(ButtonsActionEventType.WithdrawScreenBackButtonClicked);
   router.go(-1);
 };
 

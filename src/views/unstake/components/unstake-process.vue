@@ -15,7 +15,7 @@
       <error-animation />
       <h3>Something went wrong...</h3>
       <p>We’re sorry, but it looks like there’s been an error. Please refresh the page or try again later.</p>
-      <p>If the error persists, please <a href="mailto:support@enkrypt.com?subject=Enkrypt Staking Dapp Enquiry">contact support</a></p>
+      <p>If the error persists, please <a href="javascript:void(0)" @click="openContactSupport">contact support</a></p>
     </div>
     <div class="unstake-process__button">
       <base-button title="Go Back" :action="backAction" :send="true" />
@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from "vue";
 import DoneAnimation from "@/icons/animation/done.vue";
 import ErrorAnimation from "@/icons/animation/error.vue";
 import SpinnerAnimation from "@/icons/animation/spinner.vue";
@@ -39,7 +40,9 @@ import { computed } from "vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerTransaction } from "@/utils/browser";
+import { openSolscanExplorerTransaction, openContactSupport } from "@/utils/browser";
+import { trackButtonsEvents, trackScreenEvents } from '@/libs/metrics';
+import { ButtonsActionEventType, ScreenEventType } from '@/libs/metrics/types';
 
 const store = useStore();
 const router = useRouter();
@@ -47,7 +50,7 @@ const router = useRouter();
 const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
 const unstakingAccountTxId = computed(() => store.getters[StakingTypes.TX_ID_GETTER]);
 
-defineProps({
+const props = defineProps({
   isDone: {
     type: Boolean,
     default: false,
@@ -58,15 +61,24 @@ defineProps({
   },
 });
 
+watch(() => props.isError, (newValue) => {
+  if(newValue) {
+    trackScreenEvents(ScreenEventType.UnstakeErrorScreenShown);
+  }
+});
+
 const backAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.UnstakeScreenErrorBackButtonClicked);
   router.push({ name: "portfolio" });
 };
 
 const detailsAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.UnstakeScreenDetailsButtonClicked);
   openSolscanExplorerTransaction(unstakingAccountTxId.value, network.value);
 };
 
 const doneAction = () => {
+  trackButtonsEvents(ButtonsActionEventType.UnstakeScreenDoneButtonClicked);
   router.push({ name: "portfolio" });
 };
 </script>

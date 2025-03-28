@@ -12,6 +12,7 @@
     "publish": "git push origin `git subtree split --prefix dist main`:gh-pages --force"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.11",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.98.0",
     "@vueuse/core": "^11.3.0",
@@ -21,6 +22,7 @@
     "echarts": "^5.6.0",
     "ethers": "^5.7.2",
     "moment": "^2.30.1",
+    "platform": "^1.3.6",
     "redux-saga": "^1.3.0",
     "solana-wallets-vue": "^0.7.1",
     "vue": "^3.5.13",
@@ -31,6 +33,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@types/platform": "^1.3.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@typescript-eslint/parser": "^8.24.0",
@@ -53,6 +58,8 @@
     "lint-staged": "^15.4.3",
     "prettier": "^3.5.1",
     "prettier-eslint": "^16.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "stylelint": "^14.16.1",
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-recommended-vue": "^1.6.0",

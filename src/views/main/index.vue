@@ -14,11 +14,14 @@ import StakingItem from "./components/staking-item.vue";
 import { computed } from "vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
+import { trackScreenEvents } from '@/libs/metrics';
+import { ScreenEventType } from '@/libs/metrics/types';
 
 const store = useStore();
 
 const stakingItems = computed(() => store.getters[StakingTypes.STAKING_ITEMS_GETTER]);
 
+trackScreenEvents(ScreenEventType.MainScreenShown);
 </script>
 
 <style lang="less" scoped>

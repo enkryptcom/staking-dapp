@@ -3,7 +3,7 @@
     <info-icon v-if="isBigIcon" />
     <tooltip-info-icon v-else :fill="fill" :opacity="opacity" />
     <div v-show="show" class="info-tooltip__text" :class="classObject()">
-      {{ text }}
+      <span v-html="text"></span>
     </div>
   </div>
 </template>
@@ -18,12 +18,20 @@ const show = ref(false);
 const visible = ref(false);
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
-defineProps({
+const props = defineProps({
   text: {
     type: String,
     default: "",
   },
   isBigIcon: {
+    type: Boolean,
+    default: false,
+  },
+  isBigText: {
+    type: Boolean,
+    default: false,
+  },
+  isRight: {
     type: Boolean,
     default: false,
   },
@@ -66,7 +74,7 @@ const onHide = () => {
   }
 };
 const classObject = () => {
-  return { normal: true, visible: visible.value };
+  return { normal: true, visible: visible.value, 'big-text': props.isBigText, 'right-position': props.isRight };
 };
 </script>
 
@@ -103,6 +111,26 @@ const classObject = () => {
     opacity: 0;
     box-shadow: @shadow16;
     z-index: 101;
+    text-align: left;
+
+    a {
+      color: @secondaryLabel;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    &.big-text {
+      width: 304px;
+    }
+
+    &.right-position {
+      .screen-xs({
+        left: auto;
+        right: 100%;
+      });
+    }
 
     &.visible {
       opacity: 1;

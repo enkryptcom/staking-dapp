@@ -19,7 +19,10 @@
                 </p>
               </div>
               <div class="col-4">
-                <h6 class="portfolio-item__info-label">Total rewards</h6>
+                <h6 class="portfolio-item__info-label portfolio-item__info-label--flex">
+                  <span>Total rewards</span>
+                  <info-tooltip  :text="infoTooltipText" :is-big-text="true" />
+                </h6>
                 <p class="portfolio-item__info-value portfolio-item__info-value--green">
                   {{ $filters.cryptoCurrencyFormat(item.totalRewards) }} <span>{{ item.baseToken?.symbol }}</span>
                 </p>
@@ -91,6 +94,11 @@ import { SharedTypes } from "@/store/shared/consts";
 import { BASE_TOKENS } from "@/core/constants";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
 import { StakingTypes } from "@/store/modules/staking/consts";
+import { trackButtonsEvents } from '@/libs/metrics';
+import { ButtonsActionEventType } from '@/libs/metrics/types';
+import InfoTooltip from "@/components/info-tooltip/index.vue";
+
+const infoTooltipText = "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
 
 const router = useRouter();
 const store = useStore();
@@ -102,7 +110,13 @@ const props = defineProps({
     type: Object as PropType<PortfolioByChain>,
     default: () => ({}),
   },
+  isFirst: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+isOpen.value = props.isFirst;
 
 const prices = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
@@ -122,6 +136,7 @@ const toggle = () => {
 };
 
 const onStakeMoreClicked = (e: Event) => {
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenStakeMoreButtonClicked);
   e.stopPropagation();
   router.push({ name: "stake" });
 }
@@ -181,6 +196,11 @@ const onStakeMoreClicked = (e: Event) => {
       .caption__Regular();
       color: @secondaryLabel;
       margin: 0;
+
+      &--flex {
+        display: flex;
+        align-items: center;
+      }
     }
 
     &-value {
