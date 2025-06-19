@@ -45,6 +45,12 @@
           <buy-icon />
           <span>Buy SOL</span>
         </a>
+        <a 
+          href="javascript:void(0)" @click="openContactSupport" 
+          target="_blank"
+        >
+          <span>Contact Support</span>
+        </a>
       </div>
     </div>
   </div>
@@ -56,6 +62,7 @@ import HomeIcon from "@/icons/menu/home-icon.vue";
 import PortfolioIcon from "@/icons/menu/portfolio-icon.vue";
 import BuyIcon from "@/icons/menu/buy-icon.vue";
 import { useWallet } from "solana-wallets-vue";
+import { openContactSupport } from "@/utils/browser";
 
 const wallet = useWallet();
 
