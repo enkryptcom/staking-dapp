@@ -37,10 +37,9 @@ class Metrics {
         });
       }
   }
-  track(event: string, options: Record<string, unknown>) {
+  track(event: string) {
     track(
       event,
-      { ...options },
       {
         os_name: this.os,
         platform: this.browser,
