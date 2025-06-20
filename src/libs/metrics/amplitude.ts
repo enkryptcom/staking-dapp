@@ -17,7 +17,7 @@ class Metrics {
           instanceName: __IS_DEV__
             ? 'enkrypt-staking-dev'
             : 'enkrypt-staking',
-          optOut: true,
+          optOut: false,
           serverUrl: __IS_DEV__
             ? 'https://analytics-enkrypt-staking-dev.mewwallet.dev/record'
             : 'https://analytics-enkrypt-staking.mewwallet.dev/record',
