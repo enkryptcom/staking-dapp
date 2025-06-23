@@ -17,7 +17,7 @@ class Metrics {
           instanceName: __IS_DEV__
             ? 'enkrypt-staking-dev'
             : 'enkrypt-staking',
-          optOut: true,
+          optOut: false,
           serverUrl: __IS_DEV__
             ? 'https://analytics-enkrypt-staking-dev.mewwallet.dev/record'
             : 'https://analytics-enkrypt-staking.mewwallet.dev/record',
@@ -37,10 +37,9 @@ class Metrics {
         });
       }
   }
-  track(event: string, options: Record<string, unknown>) {
+  track(event: string) {
     track(
       event,
-      { ...options },
       {
         os_name: this.os,
         platform: this.browser,

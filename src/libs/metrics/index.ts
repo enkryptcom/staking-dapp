@@ -4,11 +4,11 @@ import { ButtonsActionEventType, ScreenEventType } from './types';
 const metrics = new Metrics();
 
 const trackButtonsEvents = (event: ButtonsActionEventType) => {
-  metrics.track('button', { event });
+  metrics.track(event);
 };
 
 const trackScreenEvents = (event: ScreenEventType) => {
-  metrics.track('screen', { event });
+  metrics.track(event);
 };
 
 export {
