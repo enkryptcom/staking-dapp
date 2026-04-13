@@ -15,6 +15,7 @@ import {
   GetValidatorSummaryResponse,
   GetDelegatorApyResponse,
   getDelegatorRewardsResponse,
+  RootstockAbiResponse,
 } from "@/core/interfaces";
 import { makeRequest } from "@/utils/request";
 import { P2P_VALIDATOR } from "@/core/constants"
@@ -139,6 +140,14 @@ export async function getDelegatorApy(
 ): Promise<GetDelegatorApyResponse> {
   return makeRequest<void, GetDelegatorApyResponse>({
     route: `/${chain}/data/delegator/apy?address=${stakingAddress}&addressType=${addressType}&limit=1`,
+    method: "GET",
+  });
+};
+
+export async function getRootstockAbi(): Promise<RootstockAbiResponse> {
+  return makeRequest<void, RootstockAbiResponse>({
+    route: ``,
+    externalLink: "https://metrics-api.rootstockcollective.xyz/api/rc-abi",
     method: "GET",
   });
 };

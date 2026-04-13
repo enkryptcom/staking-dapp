@@ -1,4 +1,4 @@
-export interface SolanaPriceResponse {
+export interface TokenMarketDataResponse {
   data: {
     getCoinGeckoTokenMarketDataByIds: CoinGeckoToken[],
   }
@@ -22,7 +22,7 @@ export interface CoinGeckoToken {
   current_price: number,
 };
 
-export interface SolanaPriceRequest {
+export interface TokenMarketDataRequest {
   operationName: string | null,
   variables: any,
   query: string,

@@ -17,6 +17,7 @@ export const getters = {
   getIsStakingLoading: (state: StakingState) => state.isStakingLoading,
   getStakingData: (state: StakingState) => state.stakingData,
   getStakingFee: (state: StakingState) => state.stakingFee,
+  getRootstockStakeFlowSteps: (state: StakingState) => state.rootstockStakeFlowSteps,
   getDeactivatingFee: (state: StakingState) => state.deactivatingFee,
   getWithdrawFee: (state: StakingState) => state.withdrawFee,
   getError: (state: StakingState) => state.error,

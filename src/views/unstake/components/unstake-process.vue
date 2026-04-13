@@ -2,7 +2,7 @@
   <div v-if="isDone" class="unstake-process">
     <div class="unstake-process__stack">
       <done-animation />
-      <h3>SOL Unstaked</h3>
+      <h3>{{ tokenSymbol }} Unstaked</h3>
       <p>You will be able to withdraw your stake in the next couple days once the stake account becomes unstaked.</p>
       <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
     </div>
@@ -23,8 +23,8 @@
   </div>
   <div v-else class="unstake-process unstake-process--center">
     <spinner-animation />
-    <h3>Unstaking SOL</h3>
-    <p>We are starting the process to unstake your SOL.</p>
+    <h3>Unstaking {{ tokenSymbol }}</h3>
+    <p>We are starting the process to unstake your {{ tokenSymbol }}.</p>
     <base-button v-if="unstakingAccountTxId" title="View details" :action="detailsAction" :stroke="true" :small="true" />
   </div>
 </template>
@@ -40,7 +40,8 @@ import { computed } from "vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerTransaction, openContactSupport } from "@/utils/browser";
+import { openExplorerTransaction, openContactSupport } from "@/utils/browser";
+import { BASE_TOKENS } from "@/core/constants/index";
 import { trackButtonsEvents, trackScreenEvents } from '@/libs/metrics';
 import { ButtonsActionEventType, ScreenEventType } from '@/libs/metrics/types';
 
@@ -48,6 +49,8 @@ const store = useStore();
 const router = useRouter();
 
 const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const tokenSymbol = computed(() => BASE_TOKENS[activeChain.value]?.symbol?.toUpperCase?.() ?? "");
 const unstakingAccountTxId = computed(() => store.getters[StakingTypes.TX_ID_GETTER]);
 
 const props = defineProps({
@@ -74,7 +77,7 @@ const backAction = () => {
 
 const detailsAction = () => {
   trackButtonsEvents(ButtonsActionEventType.UnstakeScreenDetailsButtonClicked);
-  openSolscanExplorerTransaction(unstakingAccountTxId.value, network.value);
+  openExplorerTransaction(unstakingAccountTxId.value, activeChain.value, network.value);
 };
 
 const doneAction = () => {

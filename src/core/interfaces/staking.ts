@@ -218,3 +218,10 @@ export interface DelegatorApy {
   grossApy: number,
   netApy: number,
 }
+
+export interface RootstockAbiResponse {
+  data: {
+    network: string,
+    abi: string,
+  }
+}

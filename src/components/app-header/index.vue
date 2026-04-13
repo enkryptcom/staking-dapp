@@ -17,23 +17,21 @@
             <span>Get Enkrypt</span>
           </a>
 
-          <!--
           <select-list
             v-if="!isToggleMenu"
-            :select="network"
-            :items="[chainsData[Chains.SOLANA]]"
+            :select="currentChainOption"
+            :items="chainOptions"
             :is-minify="true"
             :is-list-image="true"
             @update:select="selectNetworkAction"
           />
-          -->
 
           <account-select
-            v-if="wallet.connected.value && !isToggleMenu"
+            v-if="isWalletConnected && !isToggleMenu"
             :account="walletAccount"
             @disconnect="disconnectWallet"
           ></account-select>
-          <a v-else-if="!isToggleMenu && !wallet.connected.value" class="header__connect" @click="openWalletModal" href="javascript:void(0)">
+          <a v-else-if="!isToggleMenu" class="header__connect" @click="connectWallet" href="javascript:void(0)">
             Connect
           </a>
         </div>
@@ -70,13 +68,22 @@ const store = useStore();
 const router = useRouter();
 const isScroll = ref<boolean>(false);
 const wallet = useWallet();
-const network = ref<ChainDataItem>(chainsData[Chains.SOLANA]);
 const walletAccount = computed(() => store.getters[SharedTypes.WALLET_ACCOUNT_GETTER]);
 const isWalletModalOpen = computed(() => store.getters[SharedTypes.IS_CONNECT_MODAL_VISIBLE_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const isWalletConnected = computed(() => store.getters[SharedTypes.IS_WALLET_CONNECTED_GETTER]);
+const chainOptions = computed<ChainDataItem[]>(() => [
+  chainsData[Chains.SOLANA],
+  chainsData[Chains.ROOTSTOCK],
+]);
+const currentChainOption = computed<ChainDataItem>(() => chainsData[activeChain.value]);
 
 watch(
   () => wallet.publicKey?.value,
   (newVal, oldVal) => {
+    if (activeChain.value !== Chains.SOLANA) {
+      return;
+    }
     if (newVal) {
       if (oldVal && newVal.toString() !== oldVal.toString()) {
         store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
@@ -89,9 +96,13 @@ watch(
   { immediate: true }
 );
 
-const openWalletModal = () => {
+const connectWallet = async () => {
   trackButtonsEvents(ButtonsActionEventType.MainScreenConnectButtonClicked);
-  store.dispatch(SharedTypes.CONNECT_MODAL_ACTION, true);
+  if (activeChain.value === Chains.SOLANA) {
+    store.dispatch(SharedTypes.CONNECT_MODAL_ACTION, true);
+  } else {
+    await store.dispatch(SharedTypes.CONNECT_EVM_WALLET_ACTION);
+  }
 };
 
 const updateWalletModalVisibility = (visible: boolean) => {
@@ -101,9 +112,12 @@ const updateWalletModalVisibility = (visible: boolean) => {
 const disconnectWallet = async () => {
   trackButtonsEvents(ButtonsActionEventType.MainScreenDisconnectButtonClicked);
   try {
-    if (wallet.connected.value) {
+    if (activeChain.value === Chains.SOLANA && wallet.connected.value) {
       await store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
       await wallet.disconnect();
+      router.push('/');
+    } else if (activeChain.value === Chains.ROOTSTOCK) {
+      await store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
       router.push('/');
     }
   } catch (err) {
@@ -140,8 +154,17 @@ const onScroll = () => {
   }
 };
 
-const selectNetworkAction = (item: ChainDataItem) => {
-  network.value = item;
+const selectNetworkAction = async (item: ChainDataItem) => {
+  if (item.id === activeChain.value) {
+    return;
+  }
+
+  if (activeChain.value === Chains.SOLANA && wallet.connected.value) {
+    await store.dispatch(SharedTypes.DISCONNECT_WALLET_ACTION);
+    await wallet.disconnect();
+  }
+
+  await store.dispatch(SharedTypes.SWITCH_CHAIN_ACTION, item.id as Chains);
 };
 
 const toggleMenu = () => {

@@ -47,6 +47,12 @@ export const mutations = {
   setProvider(state: SharedState, provider: any) {
     state.provider = provider;
   },
+  setChain(state: SharedState, chain: string) {
+    state.chain = chain;
+  },
+  setNetwork(state: SharedState, network: string) {
+    state.network = network;
+  },
   setBalance(state: SharedState, balance: number) {
     state.balance = balance;
   },

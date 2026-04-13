@@ -1,13 +1,13 @@
 <template>
   <div class="account-select" v-if="account">
     <a ref="toggle" class="account-select__block" @click="toggleAction" href="javascript:void(0)">
-      <img :src="wallet.wallet.value?.adapter.icon" />
+      <img :src="walletIcon" />
       <span>{{ $filters.replaceWithEllipsis(account.address, 4, 4) }}</span>
       <arrow-down />
     </a>
     <div v-show="isOpen" ref="dropdown" class="account-select__dropdown">
       <div class="account-select__info">
-        <img :src="wallet.wallet.value?.adapter.icon" />
+        <img :src="walletIcon" />
         <span>{{ $filters.replaceWithEllipsis(account.address, 4, 4) }}</span>
         <a class="account-select__info-action" @click="onCopyClicked" href="javascript:void(0)">
           <copy-icon />
@@ -16,8 +16,20 @@
           <link-icon />
         </a>
       </div>
+      <div v-if="isRootstock" class="account-select__amount">
+       {{rbtcBalance <= MIN_BALANCE_EVM ? '<': ''  }} {{ $filters.cryptoCurrencyFormat(rbtcBalance) }} <span>RBTC</span>
+      </div>
       <div class="account-select__amount">
-        {{ $filters.cryptoCurrencyFormat(walletBalance) }} <span>sol</span>
+        <template v-if="isRootstock">
+          {{ Number(walletBalance || 0).toFixed(0) }}&nbsp;
+        </template>
+        <template v-else>
+          {{ $filters.cryptoCurrencyFormat(walletBalance) }}
+        </template>
+        <span>{{ balanceSymbol }}</span>
+      </div>
+      <div v-if="isRootstock" class="account-select__amount">
+        {{ Number(usdrifBalance || 0).toFixed(0) }} <span>USDRIF</span>
       </div>
       <a @click="disconnectAction" class="account-select__disconnect" href="javascript:void(0)">
         <logout-icon />
@@ -29,7 +41,7 @@
 
 <script setup lang="ts">
 import { useStore } from "vuex";
-import { PropType, ref, computed } from "vue";
+import { PropType, ref, computed, watch } from "vue";
 import { Account } from "@/types/account";
 import ArrowDown from "@/icons/common/arrow-down.vue";
 import { onClickOutside } from "@vueuse/core";
@@ -37,23 +49,36 @@ import CopyIcon from "@/icons/common/copy-icon.vue";
 import LinkIcon from "@/icons/common/link-icon.vue";
 import LogoutIcon from "@/icons/common/logout-icon.vue";
 import { SharedTypes } from "@/store/shared/consts";
-import { copyToClipboard, openSolscanExplorerAddress } from "@/utils/browser";
+import { copyToClipboard, openExplorerAddress } from "@/utils/browser";
 import { useWallet } from "solana-wallets-vue";
+import { Chains } from "@/core/interfaces";
+import { BASE_TOKENS, MIN_BALANCE_EVM, ROOTSTOCK_USDRIF_TOKEN_ADDRESS } from "@/core/constants/index";
+import EvmWalletService from "@/core/services/evmWalletService";
 
 const wallet = useWallet();
 const isOpen = ref<boolean>(false);
 const dropdown = ref(null);
 const toggle = ref(null);
 const store = useStore();
-
-const walletBalance = computed(() => store.getters[SharedTypes.WALLET_BALANCE_GETTER]);
-const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const evmWalletService = EvmWalletService.getInstance();
 
 const props = defineProps({
   account: {
     type: Object as PropType<Account>,
     default: null,
   },
+});
+
+const walletBalance = computed(() => store.getters[SharedTypes.WALLET_BALANCE_GETTER]);
+const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const walletIcon = computed(() => props.account?.image ?? wallet.wallet.value?.adapter.icon ?? "");
+const isRootstock = computed(() => activeChain.value === Chains.ROOTSTOCK);
+const rbtcBalance = ref<number>(0);
+const usdrifBalance = ref<number>(0);
+const balanceSymbol = computed(() => {
+  const chain = activeChain.value as Chains;
+  return BASE_TOKENS[chain]?.symbol?.toUpperCase?.() ?? "";
 });
 
 const emit = defineEmits(["disconnect"]);
@@ -73,8 +98,32 @@ const onCopyClicked = () => {
 }
 
 const onLinkClicked = () => {
-  openSolscanExplorerAddress(props.account.address, network.value);
+  openExplorerAddress(props.account.address, activeChain.value as Chains, network.value);
 }
+
+watch(
+  [() => props.account?.address, activeChain],
+  async ([address, chain]) => {
+    if (!address || chain !== Chains.ROOTSTOCK) {
+      rbtcBalance.value = 0;
+      usdrifBalance.value = 0;
+      return;
+    }
+
+    try {
+      const [nextRbtcBalance, nextUsdrifBalance] = await Promise.all([
+        evmWalletService.loadBalance(address),
+        evmWalletService.loadTokenBalance(address, ROOTSTOCK_USDRIF_TOKEN_ADDRESS),
+      ]);
+      rbtcBalance.value = nextRbtcBalance;
+      usdrifBalance.value = nextUsdrifBalance;
+    } catch {
+      rbtcBalance.value = 0;
+      usdrifBalance.value = 0;
+    }
+  },
+  { immediate: true }
+);
 
 onClickOutside(
   dropdown,
@@ -167,6 +216,11 @@ onClickOutside(
 
     span {
       text-transform: uppercase;
+    }
+
+    &--secondary {
+      padding-top: 0;
+      color: @secondaryLabel;
     }
   }
 

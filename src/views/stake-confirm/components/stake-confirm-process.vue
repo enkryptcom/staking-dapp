@@ -2,8 +2,8 @@
   <div v-if="isDone" class="stake-confirm-process">
     <div class="stake-confirm-process__stack">
       <done-animation />
-      <h3>SOL staked!</h3>
-      <p>Your SOL will begin earning rewards in the next couple days once the stake account is activated.</p>
+      <h3>{{ tokenSymbol }} staked!</h3>
+      <p>Your {{ tokenSymbol }} will begin earning rewards in the next couple days once the stake account is activated.</p>
       <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
     </div>
     <div class="stake-confirm-process__button">
@@ -23,8 +23,27 @@
   </div>
   <div v-else class="stake-confirm-process stake-confirm-process--center">
     <spinner-animation />
-    <h3>Staking SOL</h3>
-    <p>Creating your staking account and delegating your SOL to P2P.org validator.</p>
+    <h3>Staking {{ tokenSymbol }}</h3>
+    <p>{{ stakingDescription }}</p>
+    <div v-if="activeChain === Chains.ROOTSTOCK" class="stake-confirm-process__timeline">
+      <div
+        v-for="(step, index) in rootstockFlowSteps"
+        :key="step.id"
+        class="stake-confirm-process__timeline-item"
+      >
+        <div class="stake-confirm-process__timeline-indicator" :class="step.status">
+          {{ step.status === "done" ? "v" : index + 1 }}
+        </div>
+        <div class="stake-confirm-process__timeline-content">
+          <p class="stake-confirm-process__timeline-title" :class="`stake-confirm-process__timeline-title--${step.status}`">
+            {{ step.title }}
+          </p>
+          <p class="stake-confirm-process__timeline-status" :class="`stake-confirm-process__timeline-status--${step.status}`">
+            {{ formatStepStatus(step.status) }}
+          </p>
+        </div>
+      </div>
+    </div>
     <base-button v-if="stakingAccountTxId" title="View details" :action="detailsAction" :stroke="true" :small="true" />
   </div>
 </template>
@@ -40,15 +59,44 @@ import { computed } from "vue";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerTransaction, openContactSupport } from "@/utils/browser";
+import { openExplorerTransaction, openContactSupport } from "@/utils/browser";
 import { trackButtonsEvents, trackScreenEvents } from '@/libs/metrics';
 import { ButtonsActionEventType, ScreenEventType } from '@/libs/metrics/types';
+import { BASE_TOKENS } from "@/core/constants/index";
+import { Chains } from "@/core/interfaces";
 
 const router = useRouter();
 const store = useStore();
 
 const stakingAccountTxId = computed(() => store.getters[StakingTypes.TX_ID_GETTER]);
 const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const tokenSymbol = computed(() => BASE_TOKENS[activeChain.value]?.symbol?.toUpperCase?.() ?? "");
+const rootstockStakeFlowSteps = computed(() => store.getters[StakingTypes.ROOTSTOCK_STAKE_FLOW_STEPS_GETTER]);
+const rootstockFlowSteps = computed(() => [
+  {
+    id: "approve",
+    title: "Allow RIF spending",
+    status: rootstockStakeFlowSteps.value?.approve ?? "pending",
+  },
+  {
+    id: "stake",
+    title: "Stake RIF",
+    status: rootstockStakeFlowSteps.value?.stake ?? "pending",
+  },
+  {
+    id: "backBuilders",
+    title: "Back Top Builders",
+    status: rootstockStakeFlowSteps.value?.backBuilders ?? "pending",
+  },
+]);
+const stakingDescription = computed(() => {
+  if (activeChain.value === Chains.ROOTSTOCK) {
+    return `Processing your ${tokenSymbol.value} stake on Rootstock. This may take a moment.`;
+  }
+
+  return `Creating your staking account and delegating your ${tokenSymbol.value} to P2P.org validator.`;
+});
 
 const props = defineProps({
   isDone: {
@@ -67,6 +115,16 @@ watch(() => props.isError, (newValue) => {
   }
 });
 
+const formatStepStatus = (status: string) => {
+  if (status === "done") {
+    return "Done";
+  }
+  if (status === "in_progress") {
+    return "In progress";
+  }
+  return "Pending";
+};
+
 const backAction = () => {
   trackButtonsEvents(ButtonsActionEventType.StakingConfirmScreenErrorBackButtonClicked);
   router.push({ name: "stake" });
@@ -74,7 +132,7 @@ const backAction = () => {
 
 const detailsAction = () => {
   trackButtonsEvents(ButtonsActionEventType.StakingConfirmScreenDetailsButtonClicked);
-  openSolscanExplorerTransaction(stakingAccountTxId.value, network.value);
+  openExplorerTransaction(stakingAccountTxId.value, activeChain.value, network.value);
 };
 
 const doneAction = () => {
@@ -158,6 +216,94 @@ const doneAction = () => {
       padding: 0 0 16px 0;
 
     });
+  }
+
+  &__timeline {
+    margin-top: 16px;
+    width: 100%;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+
+  &__timeline-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  &__timeline-indicator {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid @gray016;
+    color: @gray016;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 12px;
+    font-weight: 600;
+
+    &.in_progress {
+      border-color: @accent;
+      color: @accent;
+    }
+
+    &.done {
+      border-color: @success;
+      color: @success;
+    }
+  }
+
+  &__timeline-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  &__timeline-title {
+    .caption__Regular();
+    margin: 0;
+    color: @primaryLabel;
+    padding: 0 !important;
+    text-align: left !important;
+  }
+
+  &__timeline-status {
+    .caption__Regular();
+    margin: 0;
+    color: @secondaryLabel;
+    padding: 0 !important;
+    text-align: left !important;
+
+    &--pending {
+      color: @secondaryLabel;
+    }
+
+    &--in_progress {
+      color: @accent;
+    }
+
+    &--done {
+      color: @success;
+    }
+  }
+
+  &__timeline-title {
+    &--pending {
+      color: @primaryLabel;
+    }
+
+    &--in_progress {
+      color: @accent;
+    }
+
+    &--done {
+      color: @success;
+    }
   }
 }
 </style>

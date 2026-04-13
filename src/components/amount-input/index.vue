@@ -10,7 +10,7 @@
       :small="true"
     />
     <div class="amount-input__balance" :class="{ error: !hasEnoughBalance }">
-      Balance: {{ maxValue }}
+      Balance: {{ maxValueDisplay }}
     </div>
     <div class="amount-input__wrapper">
       <input
@@ -124,6 +124,12 @@ const amountValue = computed({
 
 const prices = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const maxValueDisplay = computed(() => {
+  if (activeChain.value === "rootstock") {
+    return Number(props.maxValue || 0).toFixed(2);
+  }
+  return props.maxValue;
+});
 const amountUsd = computed(() => {
   const value = parseFloat(amountValue.value || "0");
   const price = prices.value?.[BASE_TOKENS[activeChain.value].symbol] || 0;

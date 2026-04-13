@@ -5,7 +5,7 @@
             <div class="staking-item__wrap-info">
                 <div class="staking-item__wrap-info-name">
                     <h4>{{ item.name }}</h4>
-                    <p v-if="item.apr">{{ (parseFloat(item.apr)).toFixed(2) }}% APR</p>
+                    <p v-if="item.apr">{{ (parseFloat(item.apr)).toFixed(2) }}% {{ metricLabel }}</p>
                 </div>
 
                 <div class="staking-item__wrap-info-price">
@@ -42,11 +42,11 @@
 </template>
   
 <script setup lang="ts">
-import { computed, PropType } from "vue";
+import { computed, PropType, toRefs } from "vue";
 import BaseButton from "@/components/base-button/index.vue";
 import WhiteWrapper from "@/components/white-wrapper/index.vue";
 import { useRouter } from "vue-router";
-import { StakingItemByChain } from "@/core/interfaces";
+import { StakingItemByChain, Chains } from "@/core/interfaces";
 import { use } from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import VChart from 'vue-echarts';
@@ -64,7 +64,7 @@ const store = useStore();
 const priceStats = computed(() => store.getters[SharedTypes.PRICE_STATS_GETTER]);
 const price = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object as PropType<StakingItemByChain>,
     default: () => ({}),
@@ -74,6 +74,11 @@ defineProps({
     default: false,
   },
 });
+
+const { item, isLast } = toRefs(props);
+const metricLabel = computed(() =>
+  item.value?.chainData?.id === Chains.ROOTSTOCK ? "ABI (Annual Backers Incentives)" : "APR"
+);
 
 use([SVGRenderer, LineChart, TooltipComponent, GridComponent]);
 
@@ -129,7 +134,11 @@ const startAction = () => {
 
 const buyAction = () => {
   trackButtonsEvents(ButtonsActionEventType.MainScreenBuyButtonClicked);
-  window.open("https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt", '_blank');
+  const url =
+    item.value?.chainData?.id === Chains.ROOTSTOCK
+      ? "https://rootstock.io/rbtc/#get-rbtc"
+      : "https://ccswap.myetherwallet.com/?network=SOLANA&crypto=SOL&platform=enkrypt";
+  window.open(url, '_blank');
 };
 
 const swapAction = () => {};

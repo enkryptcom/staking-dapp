@@ -1,4 +1,5 @@
 import platform from "platform";
+import { Chains } from "@/core/interfaces";
 
 export const BROWSER_NAMES = {
   chrome: "Chrome",
@@ -44,6 +45,39 @@ export const openSolscanExplorerAddress = (
 
 export const openSolscanExplorerTransaction = (id: string, cluster: string) => {
   window.open(`https://solscan.io/tx/${id}?cluster=${cluster}`, "_blank");
+};
+
+const ROOTSTOCK_EXPLORER =
+  import.meta.env.VITE_ROOTSTOCK_EXPLORER || "https://explorer.rootstock.io";
+
+export const openExplorerAddress = (
+  address: string,
+  chain: Chains,
+  cluster: string
+) => {
+  if (chain === Chains.SOLANA) {
+    openSolscanExplorerAddress(address, cluster);
+    return;
+  }
+
+  if (chain === Chains.ROOTSTOCK) {
+    window.open(`${ROOTSTOCK_EXPLORER}/address/${address}`, "_blank");
+  }
+};
+
+export const openExplorerTransaction = (
+  id: string,
+  chain: Chains,
+  cluster: string
+) => {
+  if (chain === Chains.SOLANA) {
+    openSolscanExplorerTransaction(id, cluster);
+    return;
+  }
+
+  if (chain === Chains.ROOTSTOCK) {
+    window.open(`${ROOTSTOCK_EXPLORER}/tx/${id}`, "_blank");
+  }
 };
 
 export const openContactSupport = () => {

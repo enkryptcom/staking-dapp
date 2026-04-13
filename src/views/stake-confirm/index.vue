@@ -9,6 +9,7 @@
             :account="walletAccount"
             title="From"
             :amount="walletBalance"
+            :token="nativeToken"
           />
         </div>
 
@@ -21,7 +22,7 @@
         <arrow-down-big />
       </div>
 
-      <div class="stake-confirm__block">
+      <div v-if="showValidatorInfo" class="stake-confirm__block">
         <stake-confirm-validator-item :validator="validators[Providers.p2p][activeChain]" />
       </div>
 
@@ -77,7 +78,7 @@ const isLoading = ref<boolean>(false);
 const isSend = ref<boolean>(false);
 const isSendDone = ref<boolean>(false);
 const isError = ref<boolean>(false);
-const nativeToken = ref<Token>(BASE_TOKENS[Chains.SOLANA]);
+const nativeToken = computed<Token>(() => BASE_TOKENS[activeChain.value]);
 
 const walletBalance = computed(() => store.getters[SharedTypes.WALLET_BALANCE_GETTER]);
 const amountValue = computed(() => store.getters[StakingTypes.STAKING_AMOUNT_GETTER]);
@@ -85,6 +86,7 @@ const walletAccount = computed(() => store.getters[SharedTypes.WALLET_ACCOUNT_GE
 const stakingData = computed(() => store.getters[StakingTypes.STAKING_DATA_GETTER]);
 const validators = computed(() => store.getters[StakingTypes.VALIDATORS_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const showValidatorInfo = computed(() => activeChain.value === Chains.SOLANA);
 const error = computed(() => store.getters[StakingTypes.ERROR_GETTER]);
 const fee = computed(() => store.getters[StakingTypes.STAKING_FEE_GETTER]);
 
@@ -102,6 +104,19 @@ const nextAction = async () => {
   trackScreenEvents(ScreenEventType.StackingProcessScreenShown);
 
   try {
+    if (activeChain.value === Chains.ROOTSTOCK) {
+      const result = await store.dispatch(StakingTypes.START_STAKE_ACTION, null);
+      if (result) {
+        isSendDone.value = true;
+        trackScreenEvents(ScreenEventType.StackingDoneScreenShown);
+      }
+      return;
+    }
+
+    if (!stakingData.value) {
+      throw new Error("Staking data is missing");
+    }
+
     const decodedTransaction = Buffer.from(stakingData.value.unsignedTransaction, 'base64');
     const transaction = Transaction.from(decodedTransaction);
     const signedTransaction = await wallet.signTransaction.value?.(transaction);

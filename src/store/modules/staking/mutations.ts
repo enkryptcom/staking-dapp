@@ -24,6 +24,11 @@ export interface StakingState {
   validators: ValidatorsType,
   stakingData: CreateStakeResponseResult | null,
   stakingFee: number,
+  rootstockStakeFlowSteps: {
+    approve: "pending" | "in_progress" | "done",
+    stake: "pending" | "in_progress" | "done",
+    backBuilders: "pending" | "in_progress" | "done",
+  },
   deactivatingData: StakeDeactivateResponseResult | null,
   deactivatingFee: number,
   withdrawData: StakeWithdrawResponseData | null,
@@ -46,6 +51,12 @@ export const initialState: StakingState = {
       chainData: chainsData[Chains.SOLANA],
       apr: "",
       token: BASE_TOKENS[Chains.SOLANA],
+    },
+    [Chains.ROOTSTOCK]: {
+      name: "Rootstock staking",
+      chainData: chainsData[Chains.ROOTSTOCK],
+      apr: "",
+      token: BASE_TOKENS[Chains.ROOTSTOCK],
     }
   },
   validators: {
@@ -54,11 +65,21 @@ export const initialState: StakingState = {
         validatorData: validators[Providers.p2p][Chains.SOLANA].validatorData,
         apy: "",
         fee: "",
+      },
+      [Chains.ROOTSTOCK]: {
+        validatorData: validators[Providers.p2p][Chains.ROOTSTOCK].validatorData,
+        apy: "",
+        fee: "",
       }
     }
   },
   stakingData: null,
   stakingFee: 0,
+  rootstockStakeFlowSteps: {
+    approve: "pending",
+    stake: "pending",
+    backBuilders: "pending",
+  },
   deactivatingData: null,
   deactivatingFee: 0,
   withdrawData: null,
@@ -113,9 +134,22 @@ export const mutations = {
   updateStakingLoadingState(state: StakingState, isLoading: boolean) {
     state.isStakingLoading = isLoading;
   },
-  setStakingData(state: StakingState, [stakngData, fee]: [CreateStakeResponseResult, number]) {
+  setStakingData(state: StakingState, [stakngData, fee]: [CreateStakeResponseResult | null, number]) {
     state.stakingData = stakngData;
     state.stakingFee = fee;
+  },
+  resetRootstockStakeFlowSteps(state: StakingState) {
+    state.rootstockStakeFlowSteps = {
+      approve: "pending",
+      stake: "pending",
+      backBuilders: "pending",
+    };
+  },
+  setRootstockStakeFlowStep(
+    state: StakingState,
+    [step, status]: ["approve" | "stake" | "backBuilders", "pending" | "in_progress" | "done"]
+  ) {
+    state.rootstockStakeFlowSteps[step] = status;
   },
   setDeactivatingData(state: StakingState, [deactivatingData, fee]: [StakeDeactivateResponseResult, number]) {
     state.deactivatingData = deactivatingData;

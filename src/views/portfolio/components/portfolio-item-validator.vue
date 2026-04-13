@@ -25,35 +25,57 @@
               Balance
             </h3>
             <h3 class="portfolio-item-validator__info-amount">
-              {{ $filters.cryptoCurrencyFormat(item.balance / LAMPORTS_IN_SOL) }} <span>{{ token?.symbol }}</span>
+              <template v-if="isRootstock">
+                {{ Number(displayBalance || 0).toFixed(2) }}
+              </template>
+              <template v-else>
+                {{ $filters.cryptoCurrencyFormat(displayBalance) }}
+              </template>
+              <span>&nbsp;{{ token?.symbol }}</span>
             </h3>
+            <base-button
+              v-if="showRootstockUnstake"
+              class="portfolio-item-validator__rootstock-unstake"
+              title="Unstake"
+              :stroke="true"
+              :small="true"
+              :disabled="!item.isEnabled"
+              @click="rootstockUnstake"
+            />
           </div>
           <div class="col-2">
             <h3 class="text">
               Reward
             </h3>
             <h3 class="portfolio-item-validator__info-amount portfolio-item-validator__info-amount--flex" :class="amountClassObject">
-              {{ $filters.cryptoCurrencyFormat(item.reward) }} <span>{{ token?.symbol }}</span>
+               <template v-if="isRootstock">
+               {{ Number(item.reward || 0).toFixed(2) }} <span>&nbsp;{{ token?.symbol }}</span>
+              </template>
+               <template v-else>
+               {{ $filters.cryptoCurrencyFormat(item.reward) }} <span>{{ token?.symbol }}</span>
+              </template>
               <info-tooltip  :text="rewardInfoTooltipText" :is-big-text="true" :is-right="true" />
             </h3>
           </div>
         </div>
       </div>
       <div class="col-3 portfolio-item-validator__buttons">
-        <base-button v-if="item.status === Statuses.ACTIVE || item.status === Statuses.ACTIVATING"
-          :title="`${item.isEnabled ? 'Unstake' : 'Unstaking'}`"
-          :stroke="true"
-          :disabled="!item.isEnabled"
-          :small="true"
-          @click="() => unstakeAction(indexValue)"
-        />
-        <base-button v-if="item.status === Statuses.INACTIVE" 
-          :title="`${item.isEnabled ? 'Withdraw' : 'Withdrawing'}`"
-          :disabled="!item.isEnabled"
-          :stroke="true"
-          :small="true"
-          @click="withdrawAction(indexValue)"
-        />
+        <template v-if="!isRootstock">
+          <base-button v-if="item.status === Statuses.ACTIVE || item.status === Statuses.ACTIVATING"
+            :title="`${item.isEnabled ? 'Unstake' : 'Unstaking'}`"
+            :stroke="true"
+            :disabled="!item.isEnabled"
+            :small="true"
+            @click="() => unstakeAction(indexValue)"
+          />
+          <base-button v-if="item.status === Statuses.INACTIVE" 
+            :title="`${item.isEnabled ? 'Withdraw' : 'Withdrawing'}`"
+            :disabled="!item.isEnabled"
+            :stroke="true"
+            :small="true"
+            @click="withdrawAction(indexValue)"
+          />
+        </template>
         <!-- <base-button v-if="item.status === Statuses.EMPTY" title="Close" :stroke="true" :small="true" /> -->
         <!-- <base-button v-if="item.status === Statuses.INACTIVE" title="Stake" :small="true" /> -->
 
@@ -78,11 +100,11 @@ import MoreIcon from "@/icons/common/more-icon.vue";
 import InfoTooltip from "@/components/info-tooltip/index.vue";
 import { onClickOutside } from "@vueuse/core";
 import { useRouter } from "vue-router";
-import { Statuses, Token } from "@/core/interfaces";
+import { Chains, Statuses, Token } from "@/core/interfaces";
 import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerAddress } from "@/utils/browser";
+import { openExplorerAddress } from "@/utils/browser";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
 import { trackButtonsEvents } from '@/libs/metrics';
 import { ButtonsActionEventType } from '@/libs/metrics/types';
@@ -114,6 +136,15 @@ const props = defineProps({
 
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
 const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const isRootstock = computed(() => activeChain.value === Chains.ROOTSTOCK);
+const displayBalance = computed(() => {
+  if (isRootstock.value) {
+    return props.item.balance;
+  }
+
+  return props.item.balance / LAMPORTS_IN_SOL;
+});
+const showRootstockUnstake = computed(() => isRootstock.value && props.item.balance > 0);
 
 const amountClassObject = computed(() => ({
   'portfolio-item-validator__info-amount--green': props.item.reward > 0,
@@ -142,7 +173,7 @@ const infoTooltipText = computed(() => {
   return "Your SOL is currently staked with a validator. You'll need to unstake to access these funds"
 });
 
-const rewardInfoTooltipText = "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
+const rewardInfoTooltipText = isRootstock ? "Rootstock collective adds rewards based on your stRIF allocations to innovative Builders. Your allocations shape their rewards, and you retain full ownership and access to your stRIF while earning a portion of their rewards. For more information check the <a href=\"https://wiki.rootstockcollective.xyz/\" target=\"_blank\">Whitepaper</a>." :"Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
 
 const validator = computed(() => {
   return validators[props.item.provider][activeChain.value];
@@ -186,9 +217,18 @@ const withdrawAction = async (index: number) => {
   router.push({ name: 'withdraw' });
 };
 
+const rootstockUnstake = async () => {
+  if (!showRootstockUnstake.value) {
+    return;
+  }
+
+  trackButtonsEvents(ButtonsActionEventType.PortfolioScreenUnstakeButtonButtoClicked);
+  await store.dispatch(StakingTypes.ROOTSTOCK_UNSTAKE_ACTION, props.item.balance);
+};
+
 const detailsAction = () => {
   trackButtonsEvents(ButtonsActionEventType.PortfolioScreenViewInExploreButtonClicked);
-  openSolscanExplorerAddress(props.item.stakeAccount, network.value);
+  openExplorerAddress(props.item.stakeAccount, activeChain.value, network.value);
 };
 
 </script>
@@ -472,6 +512,10 @@ const detailsAction = () => {
       opacity: 1;
       display: block;
     }
+  }
+
+  &__rootstock-unstake {
+    margin-top: 8px;
   }
 }
 </style>

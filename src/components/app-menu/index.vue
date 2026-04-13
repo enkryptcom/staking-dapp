@@ -19,10 +19,18 @@
           <span>Stake Solana</span>
         </router-link>
         <router-link 
+          :to="{ name: 'stake' }" 
+          class="stake"
+          :class="{ disabled: !isStakeRootstockEnabled }"
+          :disabled="!isStakeRootstockEnabled"
+        >
+          <span>Stake Rootstock</span>
+        </router-link>
+        <router-link 
           :to="{ name: 'portfolio' }" 
           class="portfolio"
-          :class="{ disabled: !wallet.connected.value }"
-          :disabled="!wallet.connected.value"
+          :class="{ disabled: !isPortfolioEnabled }"
+          :disabled="!isPortfolioEnabled"
         >
           <portfolio-icon />
           <span>My staking portfolio</span>
@@ -61,10 +69,53 @@
 import HomeIcon from "@/icons/menu/home-icon.vue";
 import PortfolioIcon from "@/icons/menu/portfolio-icon.vue";
 import BuyIcon from "@/icons/menu/buy-icon.vue";
+import { computed, ref, watch } from "vue";
+import { useStore } from "vuex";
 import { useWallet } from "solana-wallets-vue";
 import { openContactSupport } from "@/utils/browser";
+import { SharedTypes } from "@/store/shared/consts";
+import { Chains } from "@/core/interfaces";
+import { ROOTSTOCK_STRIF_TOKEN_ADDRESS, STRIF_TOKEN_ABI } from "@/core/constants";
+import EvmWalletService from "@/core/services/evmWalletService";
+import { ethers } from "ethers";
 
 const wallet = useWallet();
+const store = useStore();
+const evmWalletService = EvmWalletService.getInstance();
+const rootstockStakedBalance = ref(0);
+const chain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const account = computed(() => store.getters[SharedTypes.WALLET_ACCOUNT_GETTER]);
+const rootstockBalance = computed(() => store.getters[SharedTypes.WALLET_BALANCE_GETTER]);
+const isPortfolioEnabled = computed(() => {
+  if (chain.value === Chains.ROOTSTOCK) {
+    return rootstockStakedBalance.value > 0;
+  }
+  return wallet.connected.value;
+});
+const isStakeRootstockEnabled = computed(() => {
+  return chain.value === Chains.ROOTSTOCK && !!account.value?.address && rootstockBalance.value > 0;
+});
+
+watch([chain, account], async () => {
+  if (chain.value !== Chains.ROOTSTOCK || !account.value?.address) {
+    rootstockStakedBalance.value = 0;
+    return;
+  }
+
+  try {
+    const provider = evmWalletService.getRpcProvider();
+    if (!provider) {
+      rootstockStakedBalance.value = 0;
+      return;
+    }
+
+    const stRifContract = new ethers.Contract(ROOTSTOCK_STRIF_TOKEN_ADDRESS, STRIF_TOKEN_ABI, provider);
+    const balance = await stRifContract.balanceOf(account.value.address);
+    rootstockStakedBalance.value = Number(ethers.utils.formatEther(balance));
+  } catch {
+    rootstockStakedBalance.value = 0;
+  }
+}, { immediate: true });
 
 defineProps({
   isToggleMenu: {

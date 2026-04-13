@@ -1,10 +1,10 @@
 <template>
   <get-rewarded-banner />
   <staking-item
-    v-for="(item, index) in stakingItems"
+    v-for="(item, index) in filteredStakingItems"
     :key="index"
     :item="item"
-    :is-last="index == stakingItems.length - 1"
+    :is-last="index == filteredStakingItems.length - 1"
   ></staking-item>
 </template>
 
@@ -16,10 +16,16 @@ import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { trackScreenEvents } from '@/libs/metrics';
 import { ScreenEventType } from '@/libs/metrics/types';
+import { SharedTypes } from "@/store/shared/consts";
 
 const store = useStore();
 
 const stakingItems = computed(() => store.getters[StakingTypes.STAKING_ITEMS_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const filteredStakingItems = computed(() => {
+  const item = stakingItems.value?.[activeChain.value];
+  return item ? [item] : [];
+});
 
 trackScreenEvents(ScreenEventType.MainScreenShown);
 </script>

@@ -12,7 +12,7 @@
               <div class="col-4">
                 <h6 class="portfolio-item__info-label">Total staked</h6>
                 <p class="portfolio-item__info-value">
-                  {{ $filters.cryptoCurrencyFormat(item.totalStaked / LAMPORTS_IN_SOL) }} <span>{{ item.baseToken?.symbol }}</span>
+                  {{ totalStakedDisplay }} <span :class="{ 'portfolio-item__token--exact': isRootstock }">{{ totalStakedSymbol }}</span>
                 </p>
                 <p v-if="prices?.[BASE_TOKENS[activeChain].symbol]" class="portfolio-item__info-amount">
                   ~{{ $filters.currencyFormat(totalStakedUsd, "USD") }}
@@ -24,18 +24,31 @@
                   <info-tooltip  :text="infoTooltipText" :is-big-text="true" />
                 </h6>
                 <p class="portfolio-item__info-value portfolio-item__info-value--green">
-                  {{ $filters.cryptoCurrencyFormat(item.totalRewards) }} <span>{{ item.baseToken?.symbol }}</span>
+                  {{ totalRewardsDisplay }} <span>{{ item.baseToken?.symbol }}</span>
                 </p>
                 <p class="portfolio-item__info-amount">
                   ~{{ $filters.currencyFormat(totalRewardsUsd, "USD") }}
                 </p>
+                <div v-if="isRootstock" @click.stop>
+                  <base-button
+                    title="Claim my rewards"
+                    :small="true"
+                    :secondary="true"
+                    :disabled="!canClaimRewards"
+                    :loading="isLoading"
+                    :action="onClaimRewardsClicked"
+                  />
+                </div>
               </div>
               <div class="col-4">
-                <h6 class="portfolio-item__info-label">Avg. Yield</h6>
+                <h6 v-if="isRootstock" class="portfolio-item__info-label">Avg.Yield (ABI%)</h6>
+                <h6 v-else class="portfolio-item__info-label">Avg. Yield</h6>
                 <p class="portfolio-item__info-value portfolio-item__info-value--regular">
                   ~{{ $filters.percentFormat(stakingItems[activeChain].apr) }}
                 </p>
-                <p class="portfolio-item__info-amount">&nbsp;</p>
+                <p v-if="isRootstock" class="portfolio-item__info-amount">&nbsp;
+                  <info-tooltip text="Claim your rewards directly to your wallet. Claimed rewards are transferred immediately, and your unclaimed balance resets." :is-big-text="true" :is-right="true" />
+                </p>
               </div>
             </div>
           </div>
@@ -52,22 +65,23 @@
     </div>
     <Transition name="fade">
       <div v-show="isOpen" class="portfolio-item__detail">
-        <div class="row justify-content-beetwen align-items-center portfolio-item__info-header">
-          <div class="col-9">
-            <div class="row justify-content-beetwen align-items-center">
-              <div class="col-6">
-                <p class="portfolio-item__info-header-label">Validator</p>
-              </div>
-              <div class="col-2">
-                <p class="portfolio-item__info-header-label portfolio-item__info-header-label--right">Balance</p>
-              </div>
-              <div class="col-2">
-                <p class="portfolio-item__info-header-label portfolio-item__info-header-label--right">Reward</p>
+        <template v-if="!isRootstock">
+          <div class="row justify-content-beetwen align-items-center portfolio-item__info-header">
+            <div class="col-9">
+              <div class="row justify-content-beetwen align-items-center">
+                <div class="col-6">
+                  <p class="portfolio-item__info-header-label">Validator</p>
+                </div>
+                <div class="col-2">
+                  <p class="portfolio-item__info-header-label portfolio-item__info-header-label--right">Balance</p>
+                </div>
+                <div class="col-2">
+                  <p class="portfolio-item__info-header-label portfolio-item__info-header-label--right">Reward</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>      
-
+          </div>      
+        </template>
         <portfolio-item-validator
           v-for="(validator, index) in item.items"
           :key="index"
@@ -85,7 +99,7 @@
 import { computed, PropType, ref } from "vue";
 import Expand from "@/icons/common/expand.vue";
 import WhiteWrapper from "@/components/white-wrapper/index.vue";
-import { PortfolioByChain } from "@/core/interfaces";
+import { Chains, PortfolioByChain } from "@/core/interfaces";
 import PortfolioItemValidator from "./portfolio-item-validator.vue";
 import BaseButton from "@/components/base-button/index.vue";
 import { useRouter } from "vue-router";
@@ -94,11 +108,18 @@ import { SharedTypes } from "@/store/shared/consts";
 import { BASE_TOKENS } from "@/core/constants";
 import { LAMPORTS_IN_SOL } from "@/core/constants";
 import { StakingTypes } from "@/store/modules/staking/consts";
+import { cryptoCurrencyFormat } from "@/utils/filters";
 import { trackButtonsEvents } from '@/libs/metrics';
 import { ButtonsActionEventType } from '@/libs/metrics/types';
 import InfoTooltip from "@/components/info-tooltip/index.vue";
 
-const infoTooltipText = "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
+const infoTooltipText = computed(() => {
+  if (activeChain.value === Chains.ROOTSTOCK) {
+    return "Rootstock collective adds rewards based on your stRIF allocations to innovative Builders. Your allocations shape their rewards, and you retain full ownership and access to your stRIF while earning a portion of their rewards. For more information check the <a href=\"https://wiki.rootstockcollective.xyz/\" target=\"_blank\">Whitepaper</a>.";
+  }
+
+  return "Solana adds staking rewards at the end of each epoch. An epoch on Solana typically lasts around two days. If you have a stake active throughout an epoch, you'll see your rewards credited approximately <b>every two days</b>.<br />These rewards are automatically compounded if you choose to keep them staked, so over time your stake grows as long as you maintain your delegation.";
+});
 
 const router = useRouter();
 const store = useStore();
@@ -121,15 +142,32 @@ isOpen.value = props.isFirst;
 const prices = computed(() => store.getters[SharedTypes.PRICE_GETTER]);
 const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
 const stakingItems = computed(() => store.getters[StakingTypes.STAKING_ITEMS_GETTER]);
+const isLoading = computed(() => store.getters[StakingTypes.IS_LOADING_GETTER]);
+const isRootstock = computed(() => activeChain.value === Chains.ROOTSTOCK);
 
+const totalStakedAmount = computed(() => {
+  const divider = activeChain.value === Chains.ROOTSTOCK ? 1 : LAMPORTS_IN_SOL;
+  return props.item.totalStaked / divider;
+});
+const totalStakedDisplay = computed(() => {
+  if (activeChain.value === Chains.ROOTSTOCK) {
+    return Number(totalStakedAmount.value || 0).toFixed(2);
+  }
+  return cryptoCurrencyFormat(totalStakedAmount.value);
+});
+const totalStakedSymbol = computed(() => {
+  return activeChain.value === Chains.ROOTSTOCK ? "stRIF" : (props.item.baseToken?.symbol ?? "");
+});
 const totalStakedUsd = computed(() => {
   const price = prices.value?.[BASE_TOKENS[activeChain.value].symbol] || 0;
-  return (props.item.totalStaked / LAMPORTS_IN_SOL) * price;
+  return totalStakedAmount.value * price;
 });
 const totalRewardsUsd = computed(() => {
   const price = prices.value?.[BASE_TOKENS[activeChain.value].symbol] || 0;
   return props.item.totalRewards * price;
 });
+const totalRewardsDisplay = computed(() => Number(props.item.totalRewards || 0).toFixed(2));
+const canClaimRewards = computed(() => isRootstock.value && props.item.totalRewards > 0);
 
 const toggle = () => {
   isOpen.value = !isOpen.value;
@@ -139,6 +177,13 @@ const onStakeMoreClicked = (e: Event) => {
   trackButtonsEvents(ButtonsActionEventType.PortfolioScreenStakeMoreButtonClicked);
   e.stopPropagation();
   router.push({ name: "stake" });
+}
+
+const onClaimRewardsClicked = async () => {
+  if (!canClaimRewards.value || isLoading.value) {
+    return;
+  }
+  await store.dispatch(StakingTypes.CLAIM_ROOTSTOCK_REWARDS_ACTION);
 }
 </script>
 
@@ -285,6 +330,12 @@ const onStakeMoreClicked = (e: Event) => {
           text-align: right
         }
       }
+    }
+  }
+
+  &__token {
+    &--exact {
+      text-transform: none !important;
     }
   }
 

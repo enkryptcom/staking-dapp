@@ -2,14 +2,18 @@ export enum SharedTypes {
   CONNECT_PHANTOM_ACTION = "sharedStore/connectPhantomAction",
   CONNECT_ENKRYPT_ACTION = "sharedStore/connectEnkryptAction",
   CONNECTED_WALLET_ACTION = "sharedStore/walletConnectedAction",
+  CONNECT_EVM_WALLET_ACTION = "sharedStore/connectEvmWalletAction",
   LOAD_WALLET_DATA_ACTION = "sharedStore/loadWalletDataAction",
   SET_ERROR_ACTION = "sharedStore/setError",
   DISCONNECT_WALLET_ACTION = "sharedStore/disconnectWallet",
   CONNECT_MODAL_ACTION = "sharedStore/connectModalAction",
+  SWITCH_CHAIN_ACTION = "sharedStore/switchChainAction",
   SET_PRICE = "sharedStore/setPrice",
 
   SET_ACCOUNT = "sharedStore/setAccount",
   SET_WALLET_TYPE = "sharedStore/setWalletType",
+  SET_CHAIN = "sharedStore/setChain",
+  SET_NETWORK = "sharedStore/setNetwork",
   SET_CONNECT_MODAL_VISIBLE = "sharedStore/setIsConnectModalVisible",
 
   IS_WALLET_CONNECTED_GETTER = "sharedStore/isWalletConnected",

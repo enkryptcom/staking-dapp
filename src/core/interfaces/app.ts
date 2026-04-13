@@ -7,6 +7,7 @@ export enum Providers {
 export enum Chains {
   ETHEREUM = "ethereum",
   SOLANA = "solana",
+  ROOTSTOCK = "rootstock",
 };
 
 export enum Networks {

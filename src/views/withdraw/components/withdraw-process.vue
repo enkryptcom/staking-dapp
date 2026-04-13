@@ -2,8 +2,8 @@
   <div v-if="isDone" class="withdraw-process">
     <div class="withdraw-process__stack">
       <done-animation />
-      <h3>SOL Withdrawn</h3>
-      <p>Your SOL has been withdrawn.</p>
+      <h3>{{ tokenSymbol }} Withdrawn</h3>
+      <p>Your {{ tokenSymbol }} has been withdrawn.</p>
       <base-button title="View details" :action="detailsAction" :stroke="true" :small="true" />
     </div>
     <div class="withdraw-process__button">
@@ -23,8 +23,8 @@
   </div>
   <div v-else class="withdraw-process withdraw-process--center">
     <spinner-animation />
-    <h3>Withdrawing SOL</h3>
-    <p>We are withdrawing your SOL from this stake account.</p>
+    <h3>Withdrawing {{ tokenSymbol }}</h3>
+    <p>We are withdrawing your {{ tokenSymbol }} from this stake account.</p>
     <base-button v-if="withdrawTxId" title="View details" :action="detailsAction" :stroke="true" :small="true" />
   </div>
 </template>
@@ -40,14 +40,17 @@ import { StakingTypes } from "@/store/modules/staking/consts";
 import { useStore } from "vuex";
 import { computed } from "vue";
 import { SharedTypes } from "@/store/shared/consts";
-import { openSolscanExplorerTransaction, openContactSupport } from "@/utils/browser";
+import { openExplorerTransaction, openContactSupport } from "@/utils/browser";
 import { trackButtonsEvents, trackScreenEvents } from '@/libs/metrics';
 import { ButtonsActionEventType, ScreenEventType } from '@/libs/metrics/types';
+import { BASE_TOKENS } from "@/core/constants/index";
 
 const store = useStore();
 const router = useRouter();
 
 const network = computed(() => store.getters[SharedTypes.NETWORK_GETTER]);
+const activeChain = computed(() => store.getters[SharedTypes.CHAIN_GETTER]);
+const tokenSymbol = computed(() => BASE_TOKENS[activeChain.value]?.symbol?.toUpperCase?.() ?? "");
 const withdrawTxId = computed(() => store.getters[StakingTypes.TX_ID_GETTER]);
 
 const props = defineProps({
@@ -74,7 +77,7 @@ const backAction = () => {
 
 const detailsAction = () => {
   trackButtonsEvents(ButtonsActionEventType.WithdrawScreenDetailsButtonClicked);
-  openSolscanExplorerTransaction(withdrawTxId.value, network.value);
+  openExplorerTransaction(withdrawTxId.value, activeChain.value, network.value);
 };
 
 const doneAction = () => {

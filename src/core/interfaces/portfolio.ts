@@ -4,6 +4,7 @@ export interface Token {
   image: string;
   symbol: string;
   price?: number;
+  coinGeckoId?: string;
 }
 
 export interface BaseTokens {
